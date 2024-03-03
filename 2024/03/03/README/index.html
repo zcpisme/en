@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="how to start the serviceinstall python dependencies12pip install -U -r requirements.txtexport PATH&#x3D;~&#x2F;.local&#x2F;bin&#x2F;:$PATH setup environment, or use my .env123cp .env.prod .env# orcp &#x2F;tmp&#x2F;.env .env start">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2024/03/03/README/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="how to start the serviceinstall python dependencies12pip install -U -r requirements.txtexport PATH&#x3D;~&#x2F;.local&#x2F;bin&#x2F;:$PATH setup environment, or use my .env123cp .env.prod .env# orcp &#x2F;tmp&#x2F;.env .env start">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-03-03T23:30:13.371Z">
+<meta property="article:modified_time" content="2024-02-25T18:35:29.165Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-README" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/03/03/README/" class="article-date">
+  <time class="dt-published" datetime="2024-03-03T23:30:13.371Z" itemprop="datePublished">2024-03-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="how-to-start-the-service"><a href="#how-to-start-the-service" class="headerlink" title="how to start the service"></a>how to start the service</h1><h2 id="install-python-dependencies"><a href="#install-python-dependencies" class="headerlink" title="install python dependencies"></a>install python dependencies</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install -U -r requirements.txt</span><br><span class="line">export PATH=~/.local/bin/:$PATH</span><br></pre></td></tr></table></figure>
+<h2 id="setup-environment-or-use-my-env"><a href="#setup-environment-or-use-my-env" class="headerlink" title="setup environment, or use my .env"></a>setup environment, or use my .env</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp .env.prod .env</span><br><span class="line"># or</span><br><span class="line">cp /tmp/.env .env</span><br></pre></td></tr></table></figure>
+<h2 id="start-the-service-you-might-need-to-update-port-to-avoid-conflict"><a href="#start-the-service-you-might-need-to-update-port-to-avoid-conflict" class="headerlink" title="start the service, you might need to update port to avoid conflict"></a>start the service, you might need to update port to avoid conflict</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uvicorn app.app:app --host 127.0.0.1 --port 8002</span><br></pre></td></tr></table></figure>
+<h2 id="when-testing-remotely"><a href="#when-testing-remotely" class="headerlink" title="when testing remotely"></a>when testing remotely</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uvicorn app.app:app --host 0.0.0.0 --port 8002</span><br></pre></td></tr></table></figure>
+<h2 id="calling-api-remotely-to-simulate-an-front-end"><a href="#calling-api-remotely-to-simulate-an-front-end" class="headerlink" title="calling api remotely to simulate an front-end"></a>calling api remotely to simulate an front-end</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># follow the above steps to start the service, you need to adjust certain variables like port and session id and otp_code to your own case when running the following tests.</span><br><span class="line"># sign in otp</span><br><span class="line">start python3 interactive console:</span><br><span class="line">import requests</span><br><span class="line">r = requests.post(&#x27;http://127.0.0.1:8000/sign_in_otp&#x27;, json=&#123;&#x27;phone_number&#x27;: &#x27;13912345678&#x27;&#125;)</span><br><span class="line">r.content</span><br><span class="line"># confirm otp</span><br><span class="line">r = requests.post(&#x27;http://127.0.0.1:8000/confirm_otp&#x27;, json=&#123;&#x27;otp_code&#x27;: &#x27;53164&#x27;, &#x27;session_id&#x27;: &#x27;6ec3997d549dc36e39be883f9ce59884bd9a8fbe&#x27;&#125;)</span><br><span class="line">r.content</span><br><span class="line">headers = &#123;&#x27;Authorization&#x27;: &#x27;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJhNmMxNjdlODg1ZWE0YmU4MjUyZmIwMWM2MWZjNTU0MzkwODlmMzg5ZWUxYjA1OTJmYzhjNGY0MTcxOTY0MDMiLCJleHAiOjE3Mzg3NzA2NzB9.q3JnU6OrcPKwzZ4coxURUljcbbWrWWrsyjQZ8oOf5dU&#x27;&#125;</span><br><span class="line">r = requests.post(&#x27;http://127.0.0.1:8000/user_info&#x27;, json=&#123;&#x27;first_name&#x27;: &#x27;abc&#x27;, &#x27;last_name&#x27;: &#x27;def&#x27;&#125;, headers=headers)</span><br><span class="line">r.content</span><br><span class="line">r = requests.post(&#x27;http://127.0.0.1:8000/price&#x27;, json=&#123;&#x27;seller&#x27;: &#x27;target&#x27;, &#x27;upc&#x27;:&#x27;673419376730&#x27;&#125;)</span><br><span class="line">r.content</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2024/03/03/README/" data-id="cltc5ag9x0001zku2clcsdtph" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/03/03/myFirstBlog/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          myFirstBlog
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/03/03/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">March 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/03/03/myFirstBlog/">myFirstBlog</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/03/README/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2024/03/03/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
