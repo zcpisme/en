@@ -4,8 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hello World, Hexo">
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hex">
+    <meta name="keywords" content="typora-vue-theme主题介绍, Hexo">
+    <meta name="description" content="how to start the serviceinstall python dependenciespip install -U -r requirements.txt
+export PATH=~/.local/bin/:$PATH
+
+s">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +20,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Hello World | Hexo</title>
+    <title>typora-vue-theme主题介绍 | Hexo</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     
 
@@ -334,12 +337,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Hello World</h1>
+                    <h1 class="description center-align post-title">typora-vue-theme主题介绍</h1>
                 </div>
             </div>
         </div>
@@ -375,7 +378,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-03-03
+                    2018-09-07
                 </div>
                 
 
@@ -384,7 +387,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    73
+                    238
                 </div>
                 
 
@@ -406,19 +409,32 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class=" language-bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span>
+                <h1 id="how-to-start-the-service"><a href="#how-to-start-the-service" class="headerlink" title="how to start the service"></a>how to start the service</h1><h2 id="install-python-dependencies"><a href="#install-python-dependencies" class="headerlink" title="install python dependencies"></a>install python dependencies</h2><pre class=" language-bash"><code class="language-bash">pip <span class="token function">install</span> -U -r requirements.txt
+<span class="token function">export</span> PATH<span class="token operator">=</span>~/.local/bin/:<span class="token variable">$PATH</span>
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class=" language-bash"><code class="language-bash">$ hexo server
+<h2 id="setup-environment-or-use-my-env"><a href="#setup-environment-or-use-my-env" class="headerlink" title="setup environment, or use my .env"></a>setup environment, or use my .env</h2><pre><code>cp .env.prod .env
+# or
+cp /tmp/.env .env
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class=" language-bash"><code class="language-bash">$ hexo generate
+<h2 id="start-the-service-you-might-need-to-update-port-to-avoid-conflict"><a href="#start-the-service-you-might-need-to-update-port-to-avoid-conflict" class="headerlink" title="start the service, you might need to update port to avoid conflict"></a>start the service, you might need to update port to avoid conflict</h2><pre><code>uvicorn app.app:app --host 127.0.0.1 --port 8002
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class=" language-bash"><code class="language-bash">$ hexo deploy
+<h2 id="when-testing-remotely"><a href="#when-testing-remotely" class="headerlink" title="when testing remotely"></a>when testing remotely</h2><pre><code>uvicorn app.app:app --host 0.0.0.0 --port 8002
 </code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h2 id="calling-api-remotely-to-simulate-an-front-end"><a href="#calling-api-remotely-to-simulate-an-front-end" class="headerlink" title="calling api remotely to simulate an front-end"></a>calling api remotely to simulate an front-end</h2><pre><code># follow the above steps to start the service, you need to adjust certain variables like port and session id and otp_code to your own case when running the following tests.
+# sign in otp
+start python3 interactive console:
+import requests
+r = requests.post(&#39;http://127.0.0.1:8000/sign_in_otp&#39;, json=&#123;&#39;phone_number&#39;: &#39;13912345678&#39;&#125;)
+r.content
+# confirm otp
+r = requests.post(&#39;http://127.0.0.1:8000/confirm_otp&#39;, json=&#123;&#39;otp_code&#39;: &#39;53164&#39;, &#39;session_id&#39;: &#39;6ec3997d549dc36e39be883f9ce59884bd9a8fbe&#39;&#125;)
+r.content
+headers = &#123;&#39;Authorization&#39;: &#39;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJhNmMxNjdlODg1ZWE0YmU4MjUyZmIwMWM2MWZjNTU0MzkwODlmMzg5ZWUxYjA1OTJmYzhjNGY0MTcxOTY0MDMiLCJleHAiOjE3Mzg3NzA2NzB9.q3JnU6OrcPKwzZ4coxURUljcbbWrWWrsyjQZ8oOf5dU&#39;&#125;
+r = requests.post(&#39;http://127.0.0.1:8000/user_info&#39;, json=&#123;&#39;first_name&#39;: &#39;abc&#39;, &#39;last_name&#39;: &#39;def&#39;&#125;, headers=headers)
+r.content
+r = requests.post(&#39;http://127.0.0.1:8000/price&#39;, json=&#123;&#39;seller&#39;: &#39;target&#39;, &#39;upc&#39;:&#39;673419376730&#39;&#125;)
+r.content
+</code></pre>
 
                 
             </div>
@@ -445,7 +461,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://zcpisme.github.io/2024/03/03/hello-world/">https://zcpisme.github.io/2024/03/03/hello-world/</a>
+                    <a href="https://zcpisme.github.io/2018/09/07/README/">https://zcpisme.github.io/2018/09/07/README/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -563,13 +579,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2024/03/03/myFirstBlog/">
+                <a href="/2024/03/03/hello-world/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="myFirstBlog">
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Hello World">
                         
-                        <span class="card-title">myFirstBlog</span>
+                        <span class="card-title">Hello World</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -597,7 +613,7 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
             </div>
             <div class="card">
                 <a href="/2018/09/07/README/">
@@ -627,6 +643,7 @@
                         </span>
                     </div>
                 </div>
+
                 
             </div>
         </div>
