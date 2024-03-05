@@ -21,15 +21,21 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     
     <style>
-        body{
+        body {
             background-image: url(https://cdn.jsdelivr.net/gh/Tokisaki-Galaxy/res/site/medias/background.jpg);
-            background-repeat:no-repeat;
+            background-repeat: no-repeat;
             background-size: 100% 100%;
-            background-attachment:fixed;
+            background-attachment: fixed;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                background-image: none;
+                /* or use 100% auto; to keep aspect ratio */
+            }
         }
     </style>
-
-
+    
 
     <!-- bg-cover style     -->
 
@@ -360,7 +366,7 @@ git config --global user.email &quot;Github邮箱&quot;<span aria-hidden="true" 
 
 <pre class="line-numbers language-none"><code class="language-none">ssh-keygen -t rsa -C &quot;Github邮箱&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>例如，我的github用户名是 <strong>zcpisme</strong>, 用 <strong><a href="mailto:&#122;&#x63;&#112;&#x69;&#115;&#109;&#x65;&#64;&#117;&#x63;&#x68;&#105;&#99;&#x61;&#103;&#111;&#46;&#x65;&#x64;&#117;">&#122;&#x63;&#112;&#x69;&#115;&#109;&#x65;&#64;&#117;&#x63;&#x68;&#105;&#99;&#x61;&#103;&#111;&#46;&#x65;&#x64;&#117;</a></strong>（我编的一个邮箱），则在CMD输入</p>
+<p>例如，我的github用户名是 <strong>zcpisme</strong>, 用 <strong><a href="mailto:&#122;&#99;&#112;&#x69;&#115;&#x6d;&#101;&#x40;&#117;&#99;&#104;&#x69;&#x63;&#x61;&#x67;&#x6f;&#46;&#x65;&#x64;&#117;">&#122;&#99;&#112;&#x69;&#115;&#x6d;&#101;&#x40;&#117;&#99;&#104;&#x69;&#x63;&#x61;&#x67;&#x6f;&#46;&#x65;&#x64;&#117;</a></strong>（我编的一个邮箱），则在CMD输入</p>
 <pre class="line-numbers language-none"><code class="language-none">git config --global user.name &quot;zcpisme&quot;
 git config --global user.email &quot;zcpisme@uchicago.edu&quot;
 ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
