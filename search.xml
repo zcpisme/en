@@ -56,6 +56,59 @@ CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="t
       </tags>
   </entry>
   <entry>
+    <title>Internship as NLP Engineer...</title>
+    <url>/en/2024/08/20/11_2024-08-20-Intern%20Review/</url>
+    <content><![CDATA[<p>Back from a long gap… I enjoyed my Spring Break during crafting last post, but I just realized I still didn’t have an intern after a wonderful road trip (This is how PEER PRESSURE looks like!!!). Ok so, started from March, I put a lot of effort on hunting an intern. Unfortunately, most application process of intern in US had already passed deadline (another reason was: I gave up on finding intern under current suck market…), but fortunately, most summer interns just start recruitment in China, and more fortunately, I successfully got an offer from Baidu as a NLP intern. (Leetcode is the worst, evilest website I have ever seen in the world btw :)</p>
+<h1 id="About-This-Position"><a href="#About-This-Position" class="headerlink" title="About This Position"></a>About This Position</h1><ol>
+<li><strong>Construction of a Post-hoc Experiment Framework Based on Business Needs</strong></li>
+<li><strong>Development of Automated Experiment Tools &amp; Pipeline and Quantitative Metrics Tools</strong></li>
+<li><strong>Analysis and Validation of Internal Data (Domain Data Sets) from Different Business Perspectives, Exploring Scenario-based Post-hoc Experiment Validation Plans, including but not limited to</strong>:<ul>
+<li>Support for current priority business initiatives, validating the impact of new external&#x2F;internal enriched data in business scenarios.</li>
+<li>Accumulation of business experience and development of a general framework for validation within business contexts.</li>
+<li>Establishment of a connection between platform-side experimental results and customer-facing conclusions to provide smarter evaluation solutions (security &amp; permission issues to be discussed).</li>
+</ul>
+</li>
+</ol>
+<h3 id="Objectives"><a href="#Objectives" class="headerlink" title="Objectives:"></a>Objectives:</h3><ul>
+<li><strong>Short-term Goal (Urgent Support):</strong> Analyze the impact of priority business data across different scenarios.</li>
+<li><strong>Mid-term Goal:</strong> Accumulate business experience, develop a general validation framework for business scenarios, and align with PM evaluation standards to collaboratively establish scenario-based evaluation standards and plans.</li>
+<li><strong>Long-term Goal:</strong> Establish an automated scenario-based validation process that accommodates diverse user requirements across different scenarios.</li>
+</ul>
+<hr>
+<ol>
+<li><strong>P0 | Post-hoc Experiment Framework:</strong> Improve the post-hoc performance evaluation framework from an application perspective, providing reliable business evaluation results.</li>
+<li><strong>P0 | Experiment Validation:</strong> Based on the post-hoc evaluation framework, encapsulate business-oriented experiment validation tools to thoroughly and comprehensively verify the impact of core vertical data on business outcomes.</li>
+</ol>
+<p>In plain English, what all I needed to do is to <strong>train LLM models</strong> with domain (business) data and general data, and to <strong>analyze models’ performance</strong> based on open-source benchmark, and finally <strong>create a methodology</strong> about experiment and establish an <strong>evaluation platform</strong> to other colleagues to use.</p>
+<h1 id="Outcome"><a href="#Outcome" class="headerlink" title="Outcome"></a>Outcome</h1><p>In one word, I did build an evaluation platform! In this platform, user can input an API where the trained LLM deployed, and several benchmark can be selected, such as CEVAL, TruthfulQA etc. Then, the platform would save all results, and user can just click a button to aggregate all required results to generate a report. What the most fancy part is that the platform is highly flexible, which means user can also upload their also structured custom test case to generate report! </p>
+<p>However, many features can be improved (left this to who keep working on this lol). For example, user cannot delete the results. Instead, only administrator can delete results on backend. Also, sometimes, if multiple models are running, results would be saved only after all computations are done. Otherwise, if a model is shutdown by accident, even though other models are done their computations, results would be lost…</p>
+<p>Some new features are cool but still not be implemented. For example, what if we want to test open-source models? Since the platform is designed for Baidu’s Ernie Bot LLM, open-source model such as ChatGPT cannot be tested by this platform. Furthermore, even though users can aggregate results and gain a quantitative results, can we generate a readable formal report? This can be definitely done. The simplest way is just to prepare a template, and just fill all blanks. Or, may be we can try to embed another LLM (this specific model can analyze data, try some prompt engineering or train a domain model), and generate report.</p>
+<p>Whatever, this 3-month intern was fun, and I did learn a lot from it.</p>
+<h1 id="What-I-learned-from-this-internship"><a href="#What-I-learned-from-this-internship" class="headerlink" title="What I learned from this internship?"></a>What I learned from this internship?</h1><p>Many tools!</p>
+<p>Hadoop - to store large files by distributed machines, and can use MapReduce to further work on data.</p>
+<p>Spark - Great replacement for MapReduce to process data based on its RDD concept!</p>
+<p>(some inner tools cannot be written.)</p>
+<p>Use 16 x 40G GPUs to train large language model - Ernie Bot! </p>
+<p>FlaskAPI - to create backend stuff of platform.</p>
+<p>Many ideas!</p>
+<p>It was my first experience working on a giant company, so when I saw how people worked there, I learned their management mode, working style and so on. Also, I gained some further ideas on LLM’s status quo. </p>
+<p>So, yes, a wonderful internship experience!</p>
+<h1 id="Personal-Review"><a href="#Personal-Review" class="headerlink" title="Personal Review"></a>Personal Review</h1><p>Even though this internship was great, I still have (a lot of) potential improvement on m,y future work.</p>
+<p>When I trained multiple models, I may lost my way because sometimes I may mess the names and models… The results would be seemed ridiculous, so next time I should make sure the model names before training the models. Ensure quality first, then pursue speed.</p>
+<p>Making a reasonable plan is necessary. When I was asked to handle multiple things, I felt really confused. So, again, before working, it would be great to list all works should be done today and decide their priority. Having a clear plan and dealing with them one by one&#x2F;parallelly would help me handle work better.</p>
+<p>Also, communication with mentor is important, and this is nothing to explain. Thanks to mentor help me on this position.</p>
+<p>Yes, we are here! I did it, and I should get ready on graduation and a real full-time work. Bless me…</p>
+]]></content>
+      <categories>
+        <category>Internship</category>
+      </categories>
+      <tags>
+        <tag>Internship</tag>
+        <tag>NLP</tag>
+        <tag>Magic</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Devops, MLOps to LLMOps</title>
     <url>/en/2024/11/26/12_2024-11-03-XXXOps%20From%20Dev%20to%20LLM/</url>
     <content><![CDATA[<p>I can’t live without Large Language Models now 😢.</p>
@@ -341,7 +394,7 @@ git config --global user.email &quot;Github email address&quot;<span aria-hidden
 
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#x7a;&#x63;&#112;&#x69;&#x73;&#109;&#101;&#64;&#117;&#x63;&#104;&#105;&#99;&#x61;&#103;&#111;&#46;&#101;&#100;&#117;">&#x7a;&#x63;&#112;&#x69;&#x73;&#109;&#101;&#64;&#117;&#x63;&#104;&#105;&#99;&#x61;&#103;&#111;&#46;&#101;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
+<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#122;&#x63;&#x70;&#105;&#115;&#x6d;&#101;&#x40;&#117;&#x63;&#104;&#105;&#99;&#x61;&#x67;&#111;&#46;&#101;&#x64;&#x75;">&#122;&#x63;&#x70;&#105;&#115;&#x6d;&#101;&#x40;&#117;&#x63;&#104;&#105;&#99;&#x61;&#x67;&#111;&#46;&#101;&#x64;&#x75;</a></strong> (an email I made up), then you would enter in the CMD:</p>
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
 git config --global user.email &quot;zcpisme@uchicago.edu&quot;
 ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -605,59 +658,6 @@ pipe<span class="token punctuation">(</span><span class="token string">'Today I 
       <tags>
         <tag>Probability</tag>
         <tag>Mathematics</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Internship as NLP Engineer...</title>
-    <url>/en/2024/08/20/11_2024-08-20-Intern%20Review/</url>
-    <content><![CDATA[<p>Back from a long gap… I enjoyed my Spring Break during crafting last post, but I just realized I still didn’t have an intern after a wonderful road trip (This is how PEER PRESSURE looks like!!!). Ok so, started from March, I put a lot of effort on hunting an intern. Unfortunately, most application process of intern in US had already passed deadline (another reason was: I gave up on finding intern under current suck market…), but fortunately, most summer interns just start recruitment in China, and more fortunately, I successfully got an offer from Baidu as a NLP intern. (Leetcode is the worst, evilest website I have ever seen in the world btw :)</p>
-<h1 id="About-This-Position"><a href="#About-This-Position" class="headerlink" title="About This Position"></a>About This Position</h1><ol>
-<li><strong>Construction of a Post-hoc Experiment Framework Based on Business Needs</strong></li>
-<li><strong>Development of Automated Experiment Tools &amp; Pipeline and Quantitative Metrics Tools</strong></li>
-<li><strong>Analysis and Validation of Internal Data (Domain Data Sets) from Different Business Perspectives, Exploring Scenario-based Post-hoc Experiment Validation Plans, including but not limited to</strong>:<ul>
-<li>Support for current priority business initiatives, validating the impact of new external&#x2F;internal enriched data in business scenarios.</li>
-<li>Accumulation of business experience and development of a general framework for validation within business contexts.</li>
-<li>Establishment of a connection between platform-side experimental results and customer-facing conclusions to provide smarter evaluation solutions (security &amp; permission issues to be discussed).</li>
-</ul>
-</li>
-</ol>
-<h3 id="Objectives"><a href="#Objectives" class="headerlink" title="Objectives:"></a>Objectives:</h3><ul>
-<li><strong>Short-term Goal (Urgent Support):</strong> Analyze the impact of priority business data across different scenarios.</li>
-<li><strong>Mid-term Goal:</strong> Accumulate business experience, develop a general validation framework for business scenarios, and align with PM evaluation standards to collaboratively establish scenario-based evaluation standards and plans.</li>
-<li><strong>Long-term Goal:</strong> Establish an automated scenario-based validation process that accommodates diverse user requirements across different scenarios.</li>
-</ul>
-<hr>
-<ol>
-<li><strong>P0 | Post-hoc Experiment Framework:</strong> Improve the post-hoc performance evaluation framework from an application perspective, providing reliable business evaluation results.</li>
-<li><strong>P0 | Experiment Validation:</strong> Based on the post-hoc evaluation framework, encapsulate business-oriented experiment validation tools to thoroughly and comprehensively verify the impact of core vertical data on business outcomes.</li>
-</ol>
-<p>In plain English, what all I needed to do is to <strong>train LLM models</strong> with domain (business) data and general data, and to <strong>analyze models’ performance</strong> based on open-source benchmark, and finally <strong>create a methodology</strong> about experiment and establish an <strong>evaluation platform</strong> to other colleagues to use.</p>
-<h1 id="Outcome"><a href="#Outcome" class="headerlink" title="Outcome"></a>Outcome</h1><p>In one word, I did build an evaluation platform! In this platform, user can input an API where the trained LLM deployed, and several benchmark can be selected, such as CEVAL, TruthfulQA etc. Then, the platform would save all results, and user can just click a button to aggregate all required results to generate a report. What the most fancy part is that the platform is highly flexible, which means user can also upload their also structured custom test case to generate report! </p>
-<p>However, many features can be improved (left this to who keep working on this lol). For example, user cannot delete the results. Instead, only administrator can delete results on backend. Also, sometimes, if multiple models are running, results would be saved only after all computations are done. Otherwise, if a model is shutdown by accident, even though other models are done their computations, results would be lost…</p>
-<p>Some new features are cool but still not be implemented. For example, what if we want to test open-source models? Since the platform is designed for Baidu’s Ernie Bot LLM, open-source model such as ChatGPT cannot be tested by this platform. Furthermore, even though users can aggregate results and gain a quantitative results, can we generate a readable formal report? This can be definitely done. The simplest way is just to prepare a template, and just fill all blanks. Or, may be we can try to embed another LLM (this specific model can analyze data, try some prompt engineering or train a domain model), and generate report.</p>
-<p>Whatever, this 3-month intern was fun, and I did learn a lot from it.</p>
-<h1 id="What-I-learned-from-this-internship"><a href="#What-I-learned-from-this-internship" class="headerlink" title="What I learned from this internship?"></a>What I learned from this internship?</h1><p>Many tools!</p>
-<p>Hadoop - to store large files by distributed machines, and can use MapReduce to further work on data.</p>
-<p>Spark - Great replacement for MapReduce to process data based on its RDD concept!</p>
-<p>(some inner tools cannot be written.)</p>
-<p>Use 16 x 40G GPUs to train large language model - Ernie Bot! </p>
-<p>FlaskAPI - to create backend stuff of platform.</p>
-<p>Many ideas!</p>
-<p>It was my first experience working on a giant company, so when I saw how people worked there, I learned their management mode, working style and so on. Also, I gained some further ideas on LLM’s status quo. </p>
-<p>So, yes, a wonderful internship experience!</p>
-<h1 id="Personal-Review"><a href="#Personal-Review" class="headerlink" title="Personal Review"></a>Personal Review</h1><p>Even though this internship was great, I still have (a lot of) potential improvement on m,y future work.</p>
-<p>When I trained multiple models, I may lost my way because sometimes I may mess the names and models… The results would be seemed ridiculous, so next time I should make sure the model names before training the models. Ensure quality first, then pursue speed.</p>
-<p>Making a reasonable plan is necessary. When I was asked to handle multiple things, I felt really confused. So, again, before working, it would be great to list all works should be done today and decide their priority. Having a clear plan and dealing with them one by one&#x2F;parallelly would help me handle work better.</p>
-<p>Also, communication with mentor is important, and this is nothing to explain. Thanks to mentor help me on this position.</p>
-<p>Yes, we are here! I did it, and I should get ready on graduation and a real full-time work. Bless me…</p>
-]]></content>
-      <categories>
-        <category>Internship</category>
-      </categories>
-      <tags>
-        <tag>Internship</tag>
-        <tag>NLP</tag>
-        <tag>Magic</tag>
       </tags>
   </entry>
   <entry>
