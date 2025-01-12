@@ -91,7 +91,7 @@
 <p>See you next time, and I’ll share more about what I’ve been up to recently. 😊</p>
 ]]></content>
       <categories>
-        <category>Operations</category>
+        <category>CI/CD</category>
       </categories>
       <tags>
         <tag>Operations</tag>
@@ -102,6 +102,124 @@
         <tag>CI/CD</tag>
         <tag>Continuous Integration</tag>
         <tag>Continuous Delivery</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Commonly Used Commands</title>
+    <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
+    <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
+<h1 id="Common-Linux-Commands"><a href="#Common-Linux-Commands" class="headerlink" title="Common Linux Commands"></a><strong>Common Linux Commands</strong></h1><h2 id="System-Information"><a href="#System-Information" class="headerlink" title="System Information"></a><strong>System Information</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">uname</span> <span class="token parameter variable">-a</span>               <span class="token comment"># Display system information</span>
+<span class="token function">hostname</span>               <span class="token comment"># Show or set the hostname</span>
+<span class="token function">whoami</span>                 <span class="token comment"># Current logged-in user</span>
+<span class="token function">uptime</span>                 <span class="token comment"># System uptime and load</span>
+<span class="token function">date</span>                   <span class="token comment"># Current date and time</span>
+<span class="token function">cal</span>                    <span class="token comment"># Display a calendar</span>
+<span class="token function">df</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># View disk usage</span>
+<span class="token function">du</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># Check directory or file size</span>
+<span class="token function">free</span> <span class="token parameter variable">-m</span>                <span class="token comment"># View memory usage</span>
+<span class="token function">top</span>                    <span class="token comment"># Display dynamic process info</span>
+<span class="token function">htop</span>                   <span class="token comment"># Similar to top, requires installation</span>
+<span class="token function">ps</span> <span class="token parameter variable">-aux</span>                <span class="token comment"># List all running processes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="File-and-Directory-Operations"><a href="#File-and-Directory-Operations" class="headerlink" title="File and Directory Operations"></a><strong>File and Directory Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">ls</span>                     <span class="token comment"># List directory contents</span>
+<span class="token function">ls</span> <span class="token parameter variable">-l</span>                  <span class="token comment"># Show detailed information</span>
+<span class="token function">ls</span> <span class="token parameter variable">-a</span>                  <span class="token comment"># Display hidden files</span>
+<span class="token builtin class-name">cd</span> /path/to/dir        <span class="token comment"># Change directory</span>
+<span class="token builtin class-name">pwd</span>                    <span class="token comment"># Show the current path</span>
+<span class="token function">mkdir</span> new_dir          <span class="token comment"># Create a directory</span>
+<span class="token function">rmdir</span> empty_dir        <span class="token comment"># Remove an empty directory</span>
+<span class="token function">rm</span> <span class="token function">file</span>                <span class="token comment"># Delete a file</span>
+<span class="token function">rm</span> <span class="token parameter variable">-r</span> <span class="token function">dir</span>              <span class="token comment"># Delete a directory and its contents</span>
+<span class="token function">cp</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Copy files or directories</span>
+<span class="token function">mv</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Move or rename files</span>
+<span class="token function">find</span> /path <span class="token parameter variable">-name</span> <span class="token string">"*.txt"</span> <span class="token comment"># Search for files</span>
+<span class="token function">locate</span> filename        <span class="token comment"># Quickly find files</span>
+tree                   <span class="token comment"># Show directory structure as a tree (requires installation)</span>
+<span class="token function">touch</span> file.txt         <span class="token comment"># Create an empty file</span>
+<span class="token function">stat</span> file.txt          <span class="token comment"># View detailed file information</span>
+<span class="token function">file</span> file.txt          <span class="token comment"># Determine file type</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Viewing-File-Contents"><a href="#Viewing-File-Contents" class="headerlink" title="Viewing File Contents"></a><strong>Viewing File Contents</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> file.txt           <span class="token comment"># Display file content</span>
+<span class="token function">tac</span> file.txt           <span class="token comment"># Display file content in reverse order</span>
+<span class="token function">less</span> file.txt          <span class="token comment"># View file content in pages</span>
+<span class="token function">more</span> file.txt          <span class="token comment"># Similar to less</span>
+<span class="token function">head</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the first 10 lines of a file</span>
+<span class="token function">tail</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the last 10 lines of a file</span>
+<span class="token function">tail</span> <span class="token parameter variable">-f</span> log.txt        <span class="token comment"># Follow a log file in real-time</span>
+<span class="token function">nl</span> file.txt            <span class="token comment"># Display file content with line numbers</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Permission-Management"><a href="#Permission-Management" class="headerlink" title="Permission Management"></a><strong>Permission Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">755</span> file.txt     <span class="token comment"># Change permissions</span>
+<span class="token function">chown</span> user file.txt    <span class="token comment"># Change file owner</span>
+<span class="token function">chgrp</span> group file.txt   <span class="token comment"># Change file group</span>
+<span class="token builtin class-name">umask</span> 022              <span class="token comment"># Set default file permissions</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Numeric Permission Representation:</strong> Permissions are represented by three numbers (0–7) for:</p>
+<ol>
+<li><strong>Owner (User)</strong></li>
+<li><strong>Group</strong></li>
+<li><strong>Others</strong></li>
+</ol>
+<p>Each number is a sum of:</p>
+<ul>
+<li>4: Read (r)</li>
+<li>2: Write (w)</li>
+<li>1: Execute (x)</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li><code>7 = 4 + 2 + 1</code> (read, write, execute)</li>
+<li><code>5 = 4 + 1</code> (read, execute)</li>
+<li><code>6 = 4 + 2</code> (read, write)</li>
+</ul>
+<p>For <strong>755</strong>:</p>
+<ul>
+<li><strong>Owner:</strong> Read, write, execute (<code>rwx</code>)</li>
+<li><strong>Group&#x2F;Others:</strong> Read, execute (<code>r-x</code>)</li>
+</ul>
+<hr>
+<h1 id="Common-Git-Commands"><a href="#Common-Git-Commands" class="headerlink" title="Common Git Commands"></a><strong>Common Git Commands</strong></h1><h2 id="Git-Configuration"><a href="#Git-Configuration" class="headerlink" title="Git Configuration"></a><strong>Git Configuration</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> config <span class="token parameter variable">--global</span> user.name <span class="token string">"Your Name"</span>               <span class="token comment"># Set global username</span>
+<span class="token function">git</span> config <span class="token parameter variable">--global</span> user.email <span class="token string">"your.email@example.com"</span> <span class="token comment"># Set global email</span>
+<span class="token function">git</span> config <span class="token parameter variable">--list</span>                                       <span class="token comment"># View current configuration</span>
+<span class="token function">git</span> config <span class="token parameter variable">--global</span> core.editor <span class="token function">vim</span>                    <span class="token comment"># Set default editor</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Repository-Operations"><a href="#Repository-Operations" class="headerlink" title="Repository Operations"></a><strong>Repository Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> init                          <span class="token comment"># Initialize a new Git repository</span>
+<span class="token function">git</span> clone <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>              <span class="token comment"># Clone a remote repository locally</span>
+<span class="token function">git</span> status                        <span class="token comment"># View the current branch status</span>
+<span class="token function">git</span> log                           <span class="token comment"># View commit history</span>
+<span class="token function">git</span> log <span class="token parameter variable">--oneline</span>                 <span class="token comment"># Simplified commit history</span>
+<span class="token function">git</span> show <span class="token operator">&lt;</span>commit_hash<span class="token operator">></span>            <span class="token comment"># View details of a specific commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Branch-Management"><a href="#Branch-Management" class="headerlink" title="Branch Management"></a><strong>Branch Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch                        <span class="token comment"># List local branches</span>
+<span class="token function">git</span> branch <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>          <span class="token comment"># Create a new branch</span>
+<span class="token function">git</span> checkout <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>        <span class="token comment"># Switch to a specific branch</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">-b</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Create and switch to a new branch</span>
+<span class="token function">git</span> merge <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>           <span class="token comment"># Merge a branch into the current branch</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-d</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Delete a local branch</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Force delete a local branch</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Making-Changes"><a href="#Making-Changes" class="headerlink" title="Making Changes"></a><strong>Making Changes</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> <span class="token function">add</span> <span class="token operator">&lt;</span>file<span class="token operator">></span>                    <span class="token comment"># Add a file to the staging area</span>
+<span class="token function">git</span> <span class="token function">add</span> <span class="token builtin class-name">.</span>                         <span class="token comment"># Add all files in the current directory</span>
+<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"commit message"</span>    <span class="token comment"># Commit changes with a message</span>
+<span class="token function">git</span> commit <span class="token parameter variable">--amend</span>                <span class="token comment"># Modify the previous commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Remote-Repository-Operations"><a href="#Remote-Repository-Operations" class="headerlink" title="Remote Repository Operations"></a><strong>Remote Repository Operations</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote <span class="token parameter variable">-v</span>                     <span class="token comment"># View remote repository URLs</span>
+<span class="token function">git</span> remote <span class="token function">add</span> origin <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>  <span class="token comment"># Add a remote repository</span>
+<span class="token function">git</span> push origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Push a branch to the remote repository</span>
+<span class="token function">git</span> pull origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Pull updates from the remote repository</span>
+<span class="token function">git</span> fetch origin                  <span class="token comment"># Fetch updates without merging</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Stashing"><a href="#Stashing" class="headerlink" title="Stashing"></a><strong>Stashing</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> stash                         <span class="token comment"># Save current progress</span>
+<span class="token function">git</span> stash list                    <span class="token comment"># View saved stashes</span>
+<span class="token function">git</span> stash apply                   <span class="token comment"># Restore the most recent stash</span>
+<span class="token function">git</span> stash <span class="token function">clear</span>                   <span class="token comment"># Clear all stashes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+]]></content>
+      <categories>
+        <category>Programming Basics</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Git</tag>
+        <tag>common commands</tag>
       </tags>
   </entry>
   <entry>
@@ -176,7 +294,7 @@ git config --global user.email &quot;Github email address&quot;<span aria-hidden
 
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#122;&#99;&#112;&#x69;&#x73;&#x6d;&#x65;&#x40;&#x75;&#99;&#104;&#105;&#99;&#x61;&#103;&#111;&#46;&#x65;&#100;&#117;">&#122;&#99;&#112;&#x69;&#x73;&#x6d;&#x65;&#x40;&#x75;&#99;&#104;&#105;&#99;&#x61;&#103;&#111;&#46;&#x65;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
+<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#x7a;&#x63;&#x70;&#105;&#x73;&#x6d;&#x65;&#x40;&#x75;&#x63;&#104;&#105;&#x63;&#97;&#x67;&#111;&#46;&#x65;&#100;&#x75;">&#x7a;&#x63;&#x70;&#105;&#x73;&#x6d;&#x65;&#x40;&#x75;&#x63;&#104;&#105;&#x63;&#97;&#x67;&#111;&#46;&#x65;&#100;&#x75;</a></strong> (an email I made up), then you would enter in the CMD:</p>
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
 git config --global user.email &quot;zcpisme@uchicago.edu&quot;
 ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -302,121 +420,103 @@ hexo deploy
       </tags>
   </entry>
   <entry>
-    <title>Commonly Used Commands</title>
-    <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
-    <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
-<h1 id="Common-Linux-Commands"><a href="#Common-Linux-Commands" class="headerlink" title="Common Linux Commands"></a><strong>Common Linux Commands</strong></h1><h2 id="System-Information"><a href="#System-Information" class="headerlink" title="System Information"></a><strong>System Information</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">uname</span> <span class="token parameter variable">-a</span>               <span class="token comment"># Display system information</span>
-<span class="token function">hostname</span>               <span class="token comment"># Show or set the hostname</span>
-<span class="token function">whoami</span>                 <span class="token comment"># Current logged-in user</span>
-<span class="token function">uptime</span>                 <span class="token comment"># System uptime and load</span>
-<span class="token function">date</span>                   <span class="token comment"># Current date and time</span>
-<span class="token function">cal</span>                    <span class="token comment"># Display a calendar</span>
-<span class="token function">df</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># View disk usage</span>
-<span class="token function">du</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># Check directory or file size</span>
-<span class="token function">free</span> <span class="token parameter variable">-m</span>                <span class="token comment"># View memory usage</span>
-<span class="token function">top</span>                    <span class="token comment"># Display dynamic process info</span>
-<span class="token function">htop</span>                   <span class="token comment"># Similar to top, requires installation</span>
-<span class="token function">ps</span> <span class="token parameter variable">-aux</span>                <span class="token comment"># List all running processes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <title>Simple NLP — Sentiment Analysis</title>
+    <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by ChatGPT</p>
+</blockquote>
+<p>A few days ago, during an interview, the interviewer suddenly asked me, “Why are you interested in pursuing a major related to data science?” I was momentarily at a loss for words. Saying it was purely out of love seemed somewhat insincere—it’s all about making a living, after all. There aren’t always grand narratives or beautiful visions.</p>
+<p>However, I answered the interviewer like this: I said that perhaps, without us knowing, some simple data analyses could bring us a lot of information. This information could be business-related, societal, or even personal. I have the habit of keeping a daily diary (although most of it is just rambling…), and just a few days ago, I ran a simple sentiment analysis on my daily diaries using an open-source model from Hugging Face. I told the interviewer that, maybe, data analysis could also help me understand myself better.</p>
+<p>So, I decided to start a “Simple” series, which is just about using libraries without needing deep technical knowledge.</p>
+<h2 id="0，My-Diary"><a href="#0，My-Diary" class="headerlink" title="0，My Diary"></a>0，My Diary</h2><p><img src="/en/../images/3/1_diary.jpg"></p>
+<p>This is my habit of keeping a diary, writing some words, and then not using any punctuation marks (this is quite perverse), using line breaks to separate sentences. In Python, the data looks something like this: <img src="/en/../images/3/1_diary2.jpg"></p>
+<p>What I actually need is the content in <code>diary_item_content</code>. After a series of operations to extract the content, I do some simple preprocessing in preparation for analysis. (No code here, as everyone has their own diary writing habits.)</p>
+<p><img src="/en/../images/3/1_diary3.jpg" alt="just replacing line breaks with periods lol"></p>
+<h2 id="1，-Direct-Use-of-Online-Models"><a href="#1，-Direct-Use-of-Online-Models" class="headerlink" title="1， Direct Use of Online Models"></a>1， Direct Use of Online Models</h2><h3 id="1-1-Hugging-Face"><a href="#1-1-Hugging-Face" class="headerlink" title="1.1 Hugging Face"></a>1.1 Hugging Face</h3><p>At <a href="https://huggingface.co/models">Hugging Face</a>, there are many deep models available for selection. These can be used for fine-tuning or directly out of the box. (Take it and use it!)</p>
+<p>I selected <a href="https://huggingface.co/touch20032003/xuyuan-trial-sentiment-bert-chinese">xuyuan-trial-sentiment-bert-chinese</a>, a sentiment analysis model fine-tuned on a Chinese dataset with BERT. Input text, and the output is roughly as follows:</p>
+<p><img src="/en/../images/3/2_modelExp.jpg" alt="Probabilities for different sentiments"></p>
+<p>At first glance, it seems pretty accurate.</p>
+<h3 id="1-2-Python-Usage"><a href="#1-2-Python-Usage" class="headerlink" title="1.2 Python Usage"></a>1.2 Python Usage</h3><p>Using it in Python is straightforward, just:</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> pipeline <span class="token comment"># Direct use of high-level API</span>
 
-<h2 id="File-and-Directory-Operations"><a href="#File-and-Directory-Operations" class="headerlink" title="File and Directory Operations"></a><strong>File and Directory Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">ls</span>                     <span class="token comment"># List directory contents</span>
-<span class="token function">ls</span> <span class="token parameter variable">-l</span>                  <span class="token comment"># Show detailed information</span>
-<span class="token function">ls</span> <span class="token parameter variable">-a</span>                  <span class="token comment"># Display hidden files</span>
-<span class="token builtin class-name">cd</span> /path/to/dir        <span class="token comment"># Change directory</span>
-<span class="token builtin class-name">pwd</span>                    <span class="token comment"># Show the current path</span>
-<span class="token function">mkdir</span> new_dir          <span class="token comment"># Create a directory</span>
-<span class="token function">rmdir</span> empty_dir        <span class="token comment"># Remove an empty directory</span>
-<span class="token function">rm</span> <span class="token function">file</span>                <span class="token comment"># Delete a file</span>
-<span class="token function">rm</span> <span class="token parameter variable">-r</span> <span class="token function">dir</span>              <span class="token comment"># Delete a directory and its contents</span>
-<span class="token function">cp</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Copy files or directories</span>
-<span class="token function">mv</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Move or rename files</span>
-<span class="token function">find</span> /path <span class="token parameter variable">-name</span> <span class="token string">"*.txt"</span> <span class="token comment"># Search for files</span>
-<span class="token function">locate</span> filename        <span class="token comment"># Quickly find files</span>
-tree                   <span class="token comment"># Show directory structure as a tree (requires installation)</span>
-<span class="token function">touch</span> file.txt         <span class="token comment"># Create an empty file</span>
-<span class="token function">stat</span> file.txt          <span class="token comment"># View detailed file information</span>
-<span class="token function">file</span> file.txt          <span class="token comment"># Determine file type</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+pipe <span class="token operator">=</span> pipeline<span class="token punctuation">(</span><span class="token string">"text-classification"</span><span class="token punctuation">,</span> model<span class="token operator">=</span><span class="token string">"touch20032003/xuyuan-trial-sentiment-bert-chinese"</span><span class="token punctuation">)</span> <span class="token comment">#Model is selectable</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="Viewing-File-Contents"><a href="#Viewing-File-Contents" class="headerlink" title="Viewing File Contents"></a><strong>Viewing File Contents</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> file.txt           <span class="token comment"># Display file content</span>
-<span class="token function">tac</span> file.txt           <span class="token comment"># Display file content in reverse order</span>
-<span class="token function">less</span> file.txt          <span class="token comment"># View file content in pages</span>
-<span class="token function">more</span> file.txt          <span class="token comment"># Similar to less</span>
-<span class="token function">head</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the first 10 lines of a file</span>
-<span class="token function">tail</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the last 10 lines of a file</span>
-<span class="token function">tail</span> <span class="token parameter variable">-f</span> log.txt        <span class="token comment"># Follow a log file in real-time</span>
-<span class="token function">nl</span> file.txt            <span class="token comment"># Display file content with line numbers</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使用例：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">)</span>
+<span class="token comment"># output: [&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;]</span>
 
-<h2 id="Permission-Management"><a href="#Permission-Management" class="headerlink" title="Permission Management"></a><strong>Permission Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">755</span> file.txt     <span class="token comment"># Change permissions</span>
-<span class="token function">chown</span> user file.txt    <span class="token comment"># Change file owner</span>
-<span class="token function">chgrp</span> group file.txt   <span class="token comment"># Change file group</span>
-<span class="token builtin class-name">umask</span> 022              <span class="token comment"># Set default file permissions</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token comment">#or</span>
+pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token comment"># top_k = None returns all categories</span>
+<span class="token comment">#[&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;,</span>
+<span class="token comment"># &#123;'label': 'like', 'score': 0.18319253623485565&#125;,</span>
+<span class="token comment"># &#123;'label': 'disgust', 'score': 0.006669812370091677&#125;,</span>
+<span class="token comment"># &#123;'label': 'anger', 'score': 0.0025043778587132692&#125;,</span>
+<span class="token comment"># &#123;'label': 'fear', 'score': 0.0013982513919472694&#125;,</span>
+<span class="token comment"># &#123;'label': 'surprise', 'score': 0.0004570793535094708&#125;,</span>
+<span class="token comment"># &#123;'label': 'none', 'score': 0.0004206936282571405&#125;,</span>
+<span class="token comment"># &#123;'label': 'sadness', 'score': 0.0002451551263220608&#125;]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><strong>Numeric Permission Representation:</strong> Permissions are represented by three numbers (0–7) for:</p>
-<ol>
-<li><strong>Owner (User)</strong></li>
-<li><strong>Group</strong></li>
-<li><strong>Others</strong></li>
-</ol>
-<p>Each number is a sum of:</p>
+<h3 id="1-3-Simple-“For-Loop”"><a href="#1-3-Simple-“For-Loop”" class="headerlink" title="1.3 Simple “For Loop”"></a>1.3 Simple “For Loop”</h3><p>Not posting the code here, as it varies according to specific situations. Plus, it’s too crudely written to show off.</p>
+<p>I stored the results in a dictionary, with the key being the diary entry number, and the value being the sentiments of different paragraphs.</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+<span class="token comment">#&#123;0: &#123;0: 'like', 1: 'anger'&#125;,</span>
+<span class="token comment"># 1: &#123;0: 'happiness', 1: 'like', 2: 'sadness', 3: 'disgust', 4: 'happiness'&#125;,</span>
+<span class="token comment"># 2: &#123;0: 'sadness', 1: 'sadness'&#125;,</span>
+<span class="token comment"># 3: &#123;0: 'disgust', 1: 'none', 2: 'sadness'&#125;,</span>
+<span class="token comment"># 4: &#123;0: 'disgust', 1: 'happiness'&#125;,</span>
+<span class="token comment"># 5: &#123;0: 'sadness'&#125;,</span>
+<span class="token comment"># 6: &#123;1: 'disgust'&#125;,</span>
+<span class="token comment"># .....</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>You could save it locally as a pickle:</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> pickle
+<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'DiarySentimentRes'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+  pickle<span class="token punctuation">.</span>dump<span class="token punctuation">(</span>res<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="2-My-Sentiments"><a href="#2-My-Sentiments" class="headerlink" title="2,  My Sentiments"></a>2,  My Sentiments</h2><p>Next, I tallied the count of each emotion.</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">sentiCount <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">'sadness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'happiness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'like'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'anger'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'surprise'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'disgust'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'fear'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'none'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">&#125;</span>
+
+<span class="token keyword">for</span> i<span class="token punctuation">,</span>j <span class="token keyword">in</span> res<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token keyword">for</span> m<span class="token punctuation">,</span>n <span class="token keyword">in</span> j<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token builtin">type</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token builtin">list</span><span class="token punctuation">:</span>
+      <span class="token keyword">for</span> k <span class="token keyword">in</span> n<span class="token punctuation">:</span>
+        sentiCount<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+      sentiCount<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
+    
+<span class="token keyword">print</span><span class="token punctuation">(</span>sentiCount<span class="token punctuation">)</span>
+<span class="token triple-quoted-string string">'''
+&#123;'sadness': 1227,
+ 'happiness': 1075,
+ 'like': 784,
+ 'anger': 550,
+ 'surprise': 129,
+ 'disgust': 918,
+ 'fear': 106,
+ 'none': 558&#125;
+'''</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>(It turns out happiness and sadness are almost equally distributed, probably because I only remember to write my diary late at night, hence the deep-night emo moments 😟)</p>
+<p>I simply plotted a pie chart,</p>
+<p><img src="/en/../images/3/3_sentpie.jpg" alt="happy to see I&#39;m emotional"></p>
+<h2 id="3，-Some-Basic-Concepts"><a href="#3，-Some-Basic-Concepts" class="headerlink" title="3， Some Basic Concepts"></a>3， Some Basic Concepts</h2><p>In today’s AI-booming era, operations have gradually become simplified, allowing for direct model usage without the need for extensive explanations. Most people can quickly get involved and learn about their interests in AI. AI drawing even has open-source graphical interfaces, eliminating the need for even basic programming languages like Python. Thus, everything seems simple (at least if you don’t delve too deep, perhaps).</p>
+<p>Back to sentiment analysis, one could actually train a classifier themselves (SVM, Logistic Regression, etc.), and the results might not necessarily be worse than those of so-called deep learning models. Frankly, if there’s an appropriate dataset, hard training might yield even better results.</p>
+<h2 id="4，-一些小概念"><a href="#4，-一些小概念" class="headerlink" title="4， 一些小概念"></a>4， 一些小概念</h2><p>Indeed, I prefer to discuss conceptual stuff later on, as starting with all sorts of technical jargon can be headache-inducing.</p>
 <ul>
-<li>4: Read (r)</li>
-<li>2: Write (w)</li>
-<li>1: Execute (x)</li>
+<li>Transformer: An encoder-decoder architecture that shone brightly after being mentioned in <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a>.</li>
+<li>Encoder: The Encoder understands the content of an article and passes the information to the Decoder.</li>
+<li>Decoder: Generates corresponding tasks using the results given by the Encoder.</li>
+<li>BERT (Bidirectional Encoder Representations from Transformers): The encoder part of a transformer, usually used for article classification, named entity recognition, and other tasks.</li>
+<li>GPT (Generative Pretrained Transformer): In contrast to BERT, it uses only the decoder part, typically for generative tasks.</li>
 </ul>
-<p>Examples:</p>
-<ul>
-<li><code>7 = 4 + 2 + 1</code> (read, write, execute)</li>
-<li><code>5 = 4 + 1</code> (read, execute)</li>
-<li><code>6 = 4 + 2</code> (read, write)</li>
-</ul>
-<p>For <strong>755</strong>:</p>
-<ul>
-<li><strong>Owner:</strong> Read, write, execute (<code>rwx</code>)</li>
-<li><strong>Group&#x2F;Others:</strong> Read, execute (<code>r-x</code>)</li>
-</ul>
-<hr>
-<h1 id="Common-Git-Commands"><a href="#Common-Git-Commands" class="headerlink" title="Common Git Commands"></a><strong>Common Git Commands</strong></h1><h2 id="Git-Configuration"><a href="#Git-Configuration" class="headerlink" title="Git Configuration"></a><strong>Git Configuration</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> config <span class="token parameter variable">--global</span> user.name <span class="token string">"Your Name"</span>               <span class="token comment"># Set global username</span>
-<span class="token function">git</span> config <span class="token parameter variable">--global</span> user.email <span class="token string">"your.email@example.com"</span> <span class="token comment"># Set global email</span>
-<span class="token function">git</span> config <span class="token parameter variable">--list</span>                                       <span class="token comment"># View current configuration</span>
-<span class="token function">git</span> config <span class="token parameter variable">--global</span> core.editor <span class="token function">vim</span>                    <span class="token comment"># Set default editor</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Repository-Operations"><a href="#Repository-Operations" class="headerlink" title="Repository Operations"></a><strong>Repository Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> init                          <span class="token comment"># Initialize a new Git repository</span>
-<span class="token function">git</span> clone <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>              <span class="token comment"># Clone a remote repository locally</span>
-<span class="token function">git</span> status                        <span class="token comment"># View the current branch status</span>
-<span class="token function">git</span> log                           <span class="token comment"># View commit history</span>
-<span class="token function">git</span> log <span class="token parameter variable">--oneline</span>                 <span class="token comment"># Simplified commit history</span>
-<span class="token function">git</span> show <span class="token operator">&lt;</span>commit_hash<span class="token operator">></span>            <span class="token comment"># View details of a specific commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Branch-Management"><a href="#Branch-Management" class="headerlink" title="Branch Management"></a><strong>Branch Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch                        <span class="token comment"># List local branches</span>
-<span class="token function">git</span> branch <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>          <span class="token comment"># Create a new branch</span>
-<span class="token function">git</span> checkout <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>        <span class="token comment"># Switch to a specific branch</span>
-<span class="token function">git</span> checkout <span class="token parameter variable">-b</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Create and switch to a new branch</span>
-<span class="token function">git</span> merge <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>           <span class="token comment"># Merge a branch into the current branch</span>
-<span class="token function">git</span> branch <span class="token parameter variable">-d</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Delete a local branch</span>
-<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Force delete a local branch</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="Making-Changes"><a href="#Making-Changes" class="headerlink" title="Making Changes"></a><strong>Making Changes</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> <span class="token function">add</span> <span class="token operator">&lt;</span>file<span class="token operator">></span>                    <span class="token comment"># Add a file to the staging area</span>
-<span class="token function">git</span> <span class="token function">add</span> <span class="token builtin class-name">.</span>                         <span class="token comment"># Add all files in the current directory</span>
-<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"commit message"</span>    <span class="token comment"># Commit changes with a message</span>
-<span class="token function">git</span> commit <span class="token parameter variable">--amend</span>                <span class="token comment"># Modify the previous commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="Remote-Repository-Operations"><a href="#Remote-Repository-Operations" class="headerlink" title="Remote Repository Operations"></a><strong>Remote Repository Operations</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote <span class="token parameter variable">-v</span>                     <span class="token comment"># View remote repository URLs</span>
-<span class="token function">git</span> remote <span class="token function">add</span> origin <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>  <span class="token comment"># Add a remote repository</span>
-<span class="token function">git</span> push origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Push a branch to the remote repository</span>
-<span class="token function">git</span> pull origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Pull updates from the remote repository</span>
-<span class="token function">git</span> fetch origin                  <span class="token comment"># Fetch updates without merging</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Stashing"><a href="#Stashing" class="headerlink" title="Stashing"></a><strong>Stashing</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> stash                         <span class="token comment"># Save current progress</span>
-<span class="token function">git</span> stash list                    <span class="token comment"># View saved stashes</span>
-<span class="token function">git</span> stash apply                   <span class="token comment"># Restore the most recent stash</span>
-<span class="token function">git</span> stash <span class="token function">clear</span>                   <span class="token comment"># Clear all stashes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 ]]></content>
       <categories>
-        <category>Programming Basics</category>
+        <category>Natural Language Processing (NLP)</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
-        <tag>Git</tag>
-        <tag>common commands</tag>
+        <tag>Natural Language Processing</tag>
+        <tag>Deep Learning</tag>
+        <tag>Sentiment Analysis</tag>
       </tags>
   </entry>
   <entry>
@@ -635,106 +735,6 @@ hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></sp
       <tags>
         <tag>Hexo</tag>
         <tag>Github</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Simple NLP — Sentiment Analysis</title>
-    <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
-    <content><![CDATA[<blockquote>
-<p>Translated by ChatGPT</p>
-</blockquote>
-<p>A few days ago, during an interview, the interviewer suddenly asked me, “Why are you interested in pursuing a major related to data science?” I was momentarily at a loss for words. Saying it was purely out of love seemed somewhat insincere—it’s all about making a living, after all. There aren’t always grand narratives or beautiful visions.</p>
-<p>However, I answered the interviewer like this: I said that perhaps, without us knowing, some simple data analyses could bring us a lot of information. This information could be business-related, societal, or even personal. I have the habit of keeping a daily diary (although most of it is just rambling…), and just a few days ago, I ran a simple sentiment analysis on my daily diaries using an open-source model from Hugging Face. I told the interviewer that, maybe, data analysis could also help me understand myself better.</p>
-<p>So, I decided to start a “Simple” series, which is just about using libraries without needing deep technical knowledge.</p>
-<h2 id="0，My-Diary"><a href="#0，My-Diary" class="headerlink" title="0，My Diary"></a>0，My Diary</h2><p><img src="/en/../images/3/1_diary.jpg"></p>
-<p>This is my habit of keeping a diary, writing some words, and then not using any punctuation marks (this is quite perverse), using line breaks to separate sentences. In Python, the data looks something like this: <img src="/en/../images/3/1_diary2.jpg"></p>
-<p>What I actually need is the content in <code>diary_item_content</code>. After a series of operations to extract the content, I do some simple preprocessing in preparation for analysis. (No code here, as everyone has their own diary writing habits.)</p>
-<p><img src="/en/../images/3/1_diary3.jpg" alt="just replacing line breaks with periods lol"></p>
-<h2 id="1，-Direct-Use-of-Online-Models"><a href="#1，-Direct-Use-of-Online-Models" class="headerlink" title="1， Direct Use of Online Models"></a>1， Direct Use of Online Models</h2><h3 id="1-1-Hugging-Face"><a href="#1-1-Hugging-Face" class="headerlink" title="1.1 Hugging Face"></a>1.1 Hugging Face</h3><p>At <a href="https://huggingface.co/models">Hugging Face</a>, there are many deep models available for selection. These can be used for fine-tuning or directly out of the box. (Take it and use it!)</p>
-<p>I selected <a href="https://huggingface.co/touch20032003/xuyuan-trial-sentiment-bert-chinese">xuyuan-trial-sentiment-bert-chinese</a>, a sentiment analysis model fine-tuned on a Chinese dataset with BERT. Input text, and the output is roughly as follows:</p>
-<p><img src="/en/../images/3/2_modelExp.jpg" alt="Probabilities for different sentiments"></p>
-<p>At first glance, it seems pretty accurate.</p>
-<h3 id="1-2-Python-Usage"><a href="#1-2-Python-Usage" class="headerlink" title="1.2 Python Usage"></a>1.2 Python Usage</h3><p>Using it in Python is straightforward, just:</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> pipeline <span class="token comment"># Direct use of high-level API</span>
-
-pipe <span class="token operator">=</span> pipeline<span class="token punctuation">(</span><span class="token string">"text-classification"</span><span class="token punctuation">,</span> model<span class="token operator">=</span><span class="token string">"touch20032003/xuyuan-trial-sentiment-bert-chinese"</span><span class="token punctuation">)</span> <span class="token comment">#Model is selectable</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>使用例：</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">)</span>
-<span class="token comment"># output: [&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;]</span>
-
-<span class="token comment">#or</span>
-pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token comment"># top_k = None returns all categories</span>
-<span class="token comment">#[&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;,</span>
-<span class="token comment"># &#123;'label': 'like', 'score': 0.18319253623485565&#125;,</span>
-<span class="token comment"># &#123;'label': 'disgust', 'score': 0.006669812370091677&#125;,</span>
-<span class="token comment"># &#123;'label': 'anger', 'score': 0.0025043778587132692&#125;,</span>
-<span class="token comment"># &#123;'label': 'fear', 'score': 0.0013982513919472694&#125;,</span>
-<span class="token comment"># &#123;'label': 'surprise', 'score': 0.0004570793535094708&#125;,</span>
-<span class="token comment"># &#123;'label': 'none', 'score': 0.0004206936282571405&#125;,</span>
-<span class="token comment"># &#123;'label': 'sadness', 'score': 0.0002451551263220608&#125;]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="1-3-Simple-“For-Loop”"><a href="#1-3-Simple-“For-Loop”" class="headerlink" title="1.3 Simple “For Loop”"></a>1.3 Simple “For Loop”</h3><p>Not posting the code here, as it varies according to specific situations. Plus, it’s too crudely written to show off.</p>
-<p>I stored the results in a dictionary, with the key being the diary entry number, and the value being the sentiments of different paragraphs.</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
-<span class="token comment">#&#123;0: &#123;0: 'like', 1: 'anger'&#125;,</span>
-<span class="token comment"># 1: &#123;0: 'happiness', 1: 'like', 2: 'sadness', 3: 'disgust', 4: 'happiness'&#125;,</span>
-<span class="token comment"># 2: &#123;0: 'sadness', 1: 'sadness'&#125;,</span>
-<span class="token comment"># 3: &#123;0: 'disgust', 1: 'none', 2: 'sadness'&#125;,</span>
-<span class="token comment"># 4: &#123;0: 'disgust', 1: 'happiness'&#125;,</span>
-<span class="token comment"># 5: &#123;0: 'sadness'&#125;,</span>
-<span class="token comment"># 6: &#123;1: 'disgust'&#125;,</span>
-<span class="token comment"># .....</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>You could save it locally as a pickle:</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> pickle
-<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'DiarySentimentRes'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
-  pickle<span class="token punctuation">.</span>dump<span class="token punctuation">(</span>res<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="2-My-Sentiments"><a href="#2-My-Sentiments" class="headerlink" title="2,  My Sentiments"></a>2,  My Sentiments</h2><p>Next, I tallied the count of each emotion.</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">sentiCount <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">'sadness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'happiness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'like'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'anger'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'surprise'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'disgust'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'fear'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'none'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">&#125;</span>
-
-<span class="token keyword">for</span> i<span class="token punctuation">,</span>j <span class="token keyword">in</span> res<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-  <span class="token keyword">for</span> m<span class="token punctuation">,</span>n <span class="token keyword">in</span> j<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token builtin">type</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token builtin">list</span><span class="token punctuation">:</span>
-      <span class="token keyword">for</span> k <span class="token keyword">in</span> n<span class="token punctuation">:</span>
-        sentiCount<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
-    <span class="token keyword">else</span><span class="token punctuation">:</span>
-      sentiCount<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
-    
-<span class="token keyword">print</span><span class="token punctuation">(</span>sentiCount<span class="token punctuation">)</span>
-<span class="token triple-quoted-string string">'''
-&#123;'sadness': 1227,
- 'happiness': 1075,
- 'like': 784,
- 'anger': 550,
- 'surprise': 129,
- 'disgust': 918,
- 'fear': 106,
- 'none': 558&#125;
-'''</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>(It turns out happiness and sadness are almost equally distributed, probably because I only remember to write my diary late at night, hence the deep-night emo moments 😟)</p>
-<p>I simply plotted a pie chart,</p>
-<p><img src="/en/../images/3/3_sentpie.jpg" alt="happy to see I&#39;m emotional"></p>
-<h2 id="3，-Some-Basic-Concepts"><a href="#3，-Some-Basic-Concepts" class="headerlink" title="3， Some Basic Concepts"></a>3， Some Basic Concepts</h2><p>In today’s AI-booming era, operations have gradually become simplified, allowing for direct model usage without the need for extensive explanations. Most people can quickly get involved and learn about their interests in AI. AI drawing even has open-source graphical interfaces, eliminating the need for even basic programming languages like Python. Thus, everything seems simple (at least if you don’t delve too deep, perhaps).</p>
-<p>Back to sentiment analysis, one could actually train a classifier themselves (SVM, Logistic Regression, etc.), and the results might not necessarily be worse than those of so-called deep learning models. Frankly, if there’s an appropriate dataset, hard training might yield even better results.</p>
-<h2 id="4，-一些小概念"><a href="#4，-一些小概念" class="headerlink" title="4， 一些小概念"></a>4， 一些小概念</h2><p>Indeed, I prefer to discuss conceptual stuff later on, as starting with all sorts of technical jargon can be headache-inducing.</p>
-<ul>
-<li>Transformer: An encoder-decoder architecture that shone brightly after being mentioned in <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a>.</li>
-<li>Encoder: The Encoder understands the content of an article and passes the information to the Decoder.</li>
-<li>Decoder: Generates corresponding tasks using the results given by the Encoder.</li>
-<li>BERT (Bidirectional Encoder Representations from Transformers): The encoder part of a transformer, usually used for article classification, named entity recognition, and other tasks.</li>
-<li>GPT (Generative Pretrained Transformer): In contrast to BERT, it uses only the decoder part, typically for generative tasks.</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Natural Language Processing (NLP)</category>
-      </categories>
-      <tags>
-        <tag>Natural Language Processing</tag>
-        <tag>Deep Learning</tag>
-        <tag>Sentiment Analysis</tag>
       </tags>
   </entry>
   <entry>
