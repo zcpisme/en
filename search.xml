@@ -54,6 +54,112 @@
       </tags>
   </entry>
   <entry>
+    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
+    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
+</blockquote>
+<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
+<p>Tools used:</p>
+<ul>
+<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
+<li><strong>Git</strong></li>
+<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
+</ul>
+<hr>
+<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
+<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
+<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
+<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
+<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
+</li>
+</ol>
+<hr>
+<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
+<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
+<p>To configure swap space:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
+<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
+<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
+<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
+<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
+/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
+<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
+<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
+CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
+]]></content>
+      <categories>
+        <category>Dify</category>
+      </categories>
+      <tags>
+        <tag>Dify</tag>
+        <tag>Anime</tag>
+        <tag>Rem!</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Devops, MLOps to LLMOps</title>
+    <url>/en/2024/11/26/12_2024-11-03-XXXOps%20From%20Dev%20to%20LLM/</url>
+    <content><![CDATA[<p>I can’t live without Large Language Models now 😢.</p>
+<h2 id="Begin-from-CI-CD"><a href="#Begin-from-CI-CD" class="headerlink" title="Begin from CI&#x2F;CD"></a>Begin from CI&#x2F;CD</h2><p>There are many definitions of CI&#x2F;CD (Continuous Integration&#x2F;Continuous Delivery) online, but everything related to XXXOps is based on CI&#x2F;CD.</p>
+<p>In my understanding, CI&#x2F;CD is a development and operations practice that <strong>automates building, testing, and deployment processes to improve software delivery efficiency and quality.</strong></p>
+<p>Just imagine how you use GitHub and Docker. You commit code to a repository, and the remote repository automatically compiles, builds, and tests the code. These processes fall under CI. Then, when you deploy to test and eventually to production, those steps are considered CD.</p>
+<p>In other words:</p>
+<ul>
+<li><strong>CI:</strong> Focuses on building and testing to ensure code changes are reliably integrated.</li>
+<li><strong>CD:</strong> Focuses on deployment to ensure code is smoothly delivered from the test environment to production.</li>
+</ul>
+<p>As you can see, DevOps (Development &amp; Operations) is essentially the implementation of the CI&#x2F;CD process, making software engineers’ lives easier.</p>
+<h2 id="MLOps-Further-from-DevOps"><a href="#MLOps-Further-from-DevOps" class="headerlink" title="MLOps: Further from DevOps"></a>MLOps: Further from DevOps</h2><p>MLOps includes all the concepts of DevOps but expands to cover the management of data, model training, analysis, and deployment.</p>
+<p>At this point, imagine not only managing code versions but also managing <strong>data versions</strong> (FYI, many platforms support data versioning, like Hopsworks, or even just Git) and <strong>model versions</strong> (again, tools like MLflow handle this).</p>
+<p>In short, MLOps describes the entire DevOps process but specifically for Machine Learning.</p>
+<h2 id="LLMOps-Another-Fancy-Word-for-MLOps"><a href="#LLMOps-Another-Fancy-Word-for-MLOps" class="headerlink" title="LLMOps: Another Fancy Word for MLOps"></a>LLMOps: Another Fancy Word for MLOps</h2><p>Okay, I have to say, people really love inventing new terms whenever something new pops up. LLMOps, or Large Language Model Operations, is essentially the same concept as MLOps. The only difference is that it focuses on Large Language Models rather than traditional machine learning models.</p>
+<h2 id="Connection-Between-the-Three"><a href="#Connection-Between-the-Three" class="headerlink" title="Connection Between the Three"></a>Connection Between the Three</h2><blockquote>
+<p>Generated by ChatGPT</p>
+</blockquote>
+<ul>
+<li><strong>DevOps as the Foundation:</strong> DevOps provides the standard processes for CI&#x2F;CD pipelines and infrastructure automation, forming the basis for MLOps and LLMOps.</li>
+<li><strong>MLOps as the Extension:</strong> MLOps extends DevOps practices to meet the unique needs of machine learning, including data management, model training, and deployment.</li>
+<li><strong>LLMOps as the Specialization:</strong> LLMOps focuses on the complex training, optimization, and deployment of large language models, further refining MLOps practices for generative AI.</li>
+</ul>
+<h2 id="What’s-next"><a href="#What’s-next" class="headerlink" title="What’s next?"></a>What’s next?</h2><p>Cool, this article is just an overview of XXXOps. The reason I wrote this is because I took a class called “MLOps” this quarter. At first, I thought it was fancy, but I eventually realized it was basically just about learning how to use different tools to deploy a machine learning model…</p>
+<p>Of course, that’s not the only reason. Another reason is that during the past few months while I was “missing,” I discovered a platform called <a href="https://github.com/langgenius/dify">Dify</a>. It lets you create LLM apps on your own, kind of like LLMOps, which is super cool!</p>
+<table>
+<thead>
+<tr>
+<th><img src="/en/../images/12/Megumin.png" alt="Megumin"></th>
+<th><img src="/en/../images/12/difydemo.png" alt="Dify Demo"></th>
+</tr>
+</thead>
+</table>
+<p>See you next time, and I’ll share more about what I’ve been up to recently. 😊</p>
+]]></content>
+      <categories>
+        <category>CI/CD</category>
+      </categories>
+      <tags>
+        <tag>Operations</tag>
+        <tag>DevOps</tag>
+        <tag>MLOps</tag>
+        <tag>LLMOps</tag>
+        <tag>Development</tag>
+        <tag>CI/CD</tag>
+        <tag>Continuous Integration</tag>
+        <tag>Continuous Delivery</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Commonly Used Commands</title>
     <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
     <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
@@ -169,112 +275,6 @@ tree                   <span class="token comment"># Show directory structure as
         <tag>Linux</tag>
         <tag>Git</tag>
         <tag>common commands</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Devops, MLOps to LLMOps</title>
-    <url>/en/2024/11/26/12_2024-11-03-XXXOps%20From%20Dev%20to%20LLM/</url>
-    <content><![CDATA[<p>I can’t live without Large Language Models now 😢.</p>
-<h2 id="Begin-from-CI-CD"><a href="#Begin-from-CI-CD" class="headerlink" title="Begin from CI&#x2F;CD"></a>Begin from CI&#x2F;CD</h2><p>There are many definitions of CI&#x2F;CD (Continuous Integration&#x2F;Continuous Delivery) online, but everything related to XXXOps is based on CI&#x2F;CD.</p>
-<p>In my understanding, CI&#x2F;CD is a development and operations practice that <strong>automates building, testing, and deployment processes to improve software delivery efficiency and quality.</strong></p>
-<p>Just imagine how you use GitHub and Docker. You commit code to a repository, and the remote repository automatically compiles, builds, and tests the code. These processes fall under CI. Then, when you deploy to test and eventually to production, those steps are considered CD.</p>
-<p>In other words:</p>
-<ul>
-<li><strong>CI:</strong> Focuses on building and testing to ensure code changes are reliably integrated.</li>
-<li><strong>CD:</strong> Focuses on deployment to ensure code is smoothly delivered from the test environment to production.</li>
-</ul>
-<p>As you can see, DevOps (Development &amp; Operations) is essentially the implementation of the CI&#x2F;CD process, making software engineers’ lives easier.</p>
-<h2 id="MLOps-Further-from-DevOps"><a href="#MLOps-Further-from-DevOps" class="headerlink" title="MLOps: Further from DevOps"></a>MLOps: Further from DevOps</h2><p>MLOps includes all the concepts of DevOps but expands to cover the management of data, model training, analysis, and deployment.</p>
-<p>At this point, imagine not only managing code versions but also managing <strong>data versions</strong> (FYI, many platforms support data versioning, like Hopsworks, or even just Git) and <strong>model versions</strong> (again, tools like MLflow handle this).</p>
-<p>In short, MLOps describes the entire DevOps process but specifically for Machine Learning.</p>
-<h2 id="LLMOps-Another-Fancy-Word-for-MLOps"><a href="#LLMOps-Another-Fancy-Word-for-MLOps" class="headerlink" title="LLMOps: Another Fancy Word for MLOps"></a>LLMOps: Another Fancy Word for MLOps</h2><p>Okay, I have to say, people really love inventing new terms whenever something new pops up. LLMOps, or Large Language Model Operations, is essentially the same concept as MLOps. The only difference is that it focuses on Large Language Models rather than traditional machine learning models.</p>
-<h2 id="Connection-Between-the-Three"><a href="#Connection-Between-the-Three" class="headerlink" title="Connection Between the Three"></a>Connection Between the Three</h2><blockquote>
-<p>Generated by ChatGPT</p>
-</blockquote>
-<ul>
-<li><strong>DevOps as the Foundation:</strong> DevOps provides the standard processes for CI&#x2F;CD pipelines and infrastructure automation, forming the basis for MLOps and LLMOps.</li>
-<li><strong>MLOps as the Extension:</strong> MLOps extends DevOps practices to meet the unique needs of machine learning, including data management, model training, and deployment.</li>
-<li><strong>LLMOps as the Specialization:</strong> LLMOps focuses on the complex training, optimization, and deployment of large language models, further refining MLOps practices for generative AI.</li>
-</ul>
-<h2 id="What’s-next"><a href="#What’s-next" class="headerlink" title="What’s next?"></a>What’s next?</h2><p>Cool, this article is just an overview of XXXOps. The reason I wrote this is because I took a class called “MLOps” this quarter. At first, I thought it was fancy, but I eventually realized it was basically just about learning how to use different tools to deploy a machine learning model…</p>
-<p>Of course, that’s not the only reason. Another reason is that during the past few months while I was “missing,” I discovered a platform called <a href="https://github.com/langgenius/dify">Dify</a>. It lets you create LLM apps on your own, kind of like LLMOps, which is super cool!</p>
-<table>
-<thead>
-<tr>
-<th><img src="/en/../images/12/Megumin.png" alt="Megumin"></th>
-<th><img src="/en/../images/12/difydemo.png" alt="Dify Demo"></th>
-</tr>
-</thead>
-</table>
-<p>See you next time, and I’ll share more about what I’ve been up to recently. 😊</p>
-]]></content>
-      <categories>
-        <category>CI/CD</category>
-      </categories>
-      <tags>
-        <tag>Operations</tag>
-        <tag>DevOps</tag>
-        <tag>MLOps</tag>
-        <tag>LLMOps</tag>
-        <tag>Development</tag>
-        <tag>CI/CD</tag>
-        <tag>Continuous Integration</tag>
-        <tag>Continuous Delivery</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
-    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
-    <content><![CDATA[<blockquote>
-<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
-</blockquote>
-<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
-<p>Tools used:</p>
-<ul>
-<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
-<li><strong>Git</strong></li>
-<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
-</ul>
-<hr>
-<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
-<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
-<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
-<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
-<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
-</li>
-</ol>
-<hr>
-<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
-<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
-<p>To configure swap space:</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
-<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
-<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
-<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
-<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
-/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
-<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
-<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
-CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
-]]></content>
-      <categories>
-        <category>Dify</category>
-      </categories>
-      <tags>
-        <tag>Dify</tag>
-        <tag>Anime</tag>
-        <tag>Rem!</tag>
       </tags>
   </entry>
   <entry>
@@ -509,7 +509,7 @@ git config --global user.email &quot;Github email address&quot;<span aria-hidden
 
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#x7a;&#99;&#112;&#105;&#x73;&#x6d;&#x65;&#x40;&#117;&#x63;&#104;&#x69;&#99;&#x61;&#x67;&#x6f;&#x2e;&#x65;&#100;&#117;">&#x7a;&#99;&#112;&#105;&#x73;&#x6d;&#x65;&#x40;&#117;&#x63;&#104;&#x69;&#99;&#x61;&#x67;&#x6f;&#x2e;&#x65;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
+<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#122;&#99;&#x70;&#x69;&#x73;&#109;&#101;&#x40;&#x75;&#99;&#104;&#105;&#x63;&#97;&#x67;&#111;&#x2e;&#101;&#100;&#117;">&#122;&#99;&#x70;&#x69;&#x73;&#109;&#101;&#x40;&#x75;&#99;&#104;&#105;&#x63;&#97;&#x67;&#111;&#x2e;&#101;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
 git config --global user.email &quot;zcpisme@uchicago.edu&quot;
 ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -853,87 +853,6 @@ hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></sp
       </tags>
   </entry>
   <entry>
-    <title>Copula II — Definition</title>
-    <url>/en/2024/03/15/5_2024-03-13-CopulasII-Definition/</url>
-    <content><![CDATA[<p>The word <strong><a href="https://en.wikipedia.org/wiki/Copula_(linguistics)">Copula</a></strong> derives from the Latin noun for a “link” or “tie” that connects two different things. When I talk about Copula in this post, actually I mean the <a href="https://en.wikipedia.org/wiki/Copula_(probability_theory)">Sklar’s Theorem</a>. </p>
-<p>Here is what the Sklar’s Theorem tells us: we always can find a <em>Copula function</em> \(C\) that every multivariate (a.k.a joint) cumulative distribution function(CDF) can be expressed by its marginal CDFs. In other words, we can use copula function to analyze the dependence between each random variable, and Sklar’s Theorem ensures such copula function exists.</p>
-<h2 id="Copula-Sklar’s-Theorem"><a href="#Copula-Sklar’s-Theorem" class="headerlink" title="Copula &amp; Sklar’s Theorem"></a>Copula &amp; Sklar’s Theorem</h2><blockquote>
-<p><strong>Definition</strong>: A \(\textbf{copula}\) is a function \(C: [0, 1]^n \rightarrow [0, 1]\) with the following properties: </p>
-<ul>
-<li><p>For every \(u_1, u_2, \ldots, u_n \in [0, 1]\), \(C(1, 1, \ldots, u_i, \ldots, 1) &#x3D; u_i\). </p>
-</li>
-<li><p>For every \(u_1, u_2, \ldots, u_n \in [0, 1]\), if any \(u_i &#x3D; 0\), then \(C(u_1, u_2, \ldots, u_n) &#x3D; 0\). </p>
-</li>
-<li><p>\(C\) is \(\textbf{n-increasing}\), meaning that for any \(a_1 \leq b_1, a_2 \leq b_2, \ldots, a_n \leq b_n\) in \([0, 1]\), the C-volume of the n-dimensional interval \([a_1, b_1] \times [a_2, b_2] \times \ldots \times [a_n, b_n]\) is nonnegative. That is,  $$\begin{equation} \Delta C \geq 0, \end{equation}$$ where $\Delta C$ is the C-volume, a difference of values of $C$ that resembles a high-dimensional version of the finite difference. </p>
-<blockquote>
-<p>Note: Given a copula $C: [0, 1]^n \rightarrow [0, 1]$, the $\Delta C$ for a box defined by the intervals $[a_1, b_1], [a_2, b_2], \ldots, [a_n, b_n]$ in $[0, 1]^n$ is calculated as follows: $$\begin{equation} \Delta C &#x3D; \sum_{(i_1, i_2, \ldots, i_n) \in {0,1}^n} (-1)^{i_1 + i_2 + \cdots + i_n} C\left(b_1^{(i_1)}, b_2^{(i_2)}, \ldots, b_n^{(i_n)}\right), \end{equation}$$ where $b_j^{(i_j)} &#x3D; a_j$ if $i_j &#x3D; 0$ and $b_j^{(i_j)} &#x3D; b_j$ if $i_j &#x3D; 1$ for $1 \leq j \leq n$. This formula applies the inclusion-exclusion principle to calculate the volume under the copula over the specified box.</p>
-<p>Consider a 2-dimensional copula $C: [0, 1]^2 \rightarrow [0, 1]$. To calculate the $\Delta C$ for a box in $[0, 1]^2$ defined by the intervals $[a_1, b_1]$ and $[a_2, b_2]$, we use the formula: \begin{equation} \Delta C &#x3D; C(b_1, b_2) - C(a_1, b_2) - C(b_1, a_2) + C(a_1, a_2). \end{equation} This represents the inclusion-exclusion principle in 2 dimensions, ensuring that we correctly account for the volume under $C$ over the box by subtracting and adding the values of $C$ at the corners of the box. </p>
-<p>In one word, we just want to make sure the volume inside the squre (\([0, 1] \times[0,1]\)) is positive. (Review the probability from joint CDF. For example, \(P(a_1&lt;X&lt;a_2, b_1&lt;Y&lt;b_2)\))</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>Sklar’s Theorem</strong>: For any joint distribution function \(H\) of random variables \(X_1, X_2, \ldots, X_n\) with marginal distribution functions \(F_1, F_2, \ldots, F_n\), there <strong>exists</strong> a copula \(C: [0, 1]^n \rightarrow [0, 1]\) such that for all \(x_1, x_2, \ldots, x_n\) in the extended real line (\(\overline{\mathbb{R}}\) or \(\mathbb{R} \cup \{-\infty,\infty\}\)), $$\begin{equation} H(x_1, x_2, \ldots, x_n) &#x3D; C(F_1(x_1), F_2(x_2), \ldots, F_n(x_n)). \end{equation}$$ Furthermore, if the marginal distribution functions \(F_1, F_2, \ldots, F_n\) are continuous, then the copula \(C\) is <strong>unique</strong>. This means that the joint distribution \(H\) can be fully specified by its marginals and the copula \(C\).</p>
-<blockquote>
-<p><strong>Brief Proof</strong>: Currently, we only consider continuous case (CDF can be discontinuous, but that requires lots of math, and I don’t understand it 🙃. It I think is necessary, I may update in the future though I think continuous case is enough for most scenarios).</p>
-<ol>
-<li><p><strong>existence</strong>: Here, we use the definition of generalized inverse distribution function where </p>
-<p>$$F^{-1}_X(y) &#x3D; \inf\{x : F_X(x) \geq y\}, \quad  0 \leq y \leq 1.$$</p>
-<p>By <a href="https://zcpisme.github.io/en/2024/03/10/4_Probability%20%E2%80%94%20Probability%20Integral%20Transform/">Probability Integral Transform</a>, we know $U_i &#x3D; F_i(X_i)$ is normally distributed on $[0,1]$ for $i &#x3D; 1, 2,…,n$. We can easily construct copula function $C : [0, 1]^n \rightarrow [0, 1]$ s.t</p>
-<p>$$C(u_1, u_2, …, u_n) &#x3D; H(F^{-1}_1, F^{-1}_2,…, F^{-1}_n).$$</p>
-<p>Here, $C(1,…,1,u_i,1,…,1) &#x3D; u_i$ and $C(u_1,…,u_{i-1},0 ,u_{i+1},…,u_n) &#x3D; 0$ are obvious because it just means marginal CDF or the probability of a single point, which is 0. Also, $C$ is $n$-increasing because we define it from CDFs, which is non-negative for sure.</p>
-</li>
-<li><p><strong>uniqueness</strong>(skip): Simply because the continuous marginal CDF is one-to-one (bijective) function, so each copula has to follow same “mapping way” to connect marginal CDFs and joint CDF.</p>
-</li>
-</ol>
-</blockquote>
-</blockquote>
-<h2 id="Type-of-Copulas"><a href="#Type-of-Copulas" class="headerlink" title="Type of Copulas"></a>Type of Copulas</h2><p>Theoretically, there are infinite types of Copula functions based on different distributions. I’ll introduce some common Copulas in bivariate distribution.</p>
-<h3 id="1-Gaussian-Copula"><a href="#1-Gaussian-Copula" class="headerlink" title="1, Gaussian Copula"></a>1, Gaussian Copula</h3><ul>
-<li><strong>Symmetry</strong>: Gaussian copulas are symmetric, meaning they assign equal probability to joint tail events.</li>
-<li><strong>No Tail Dependence</strong>: Gaussian copulas do not have tail dependence, implying that they underestimate the probability of extreme co-movements.</li>
-</ul>
-<p>General Formula: $C(u,v;\theta) &#x3D; \Phi_{\theta}(\Phi^{-1}(u), \Phi^{-1}(v))$</p>
-<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; \Phi \left( \Phi^{-1}(\alpha) \sqrt{1-\theta^2} + \theta\Phi^{-1}(u) \right)$, $\theta \in [-1,1]$</p>
-<p><img src="/en/../images/5/gauCo.png" alt="$\theta = 0.7$"></p>
-<h3 id="2-Gumbel-Copula"><a href="#2-Gumbel-Copula" class="headerlink" title="2, Gumbel Copula"></a>2, Gumbel Copula</h3><ul>
-<li><strong>Asymmetry</strong>: The Gumbel copula is asymmetric, with more weight on the joint upper tails, capturing the events where both variables achieve high values together.</li>
-<li><strong>Upper Tail Dependence</strong>: It exhibits upper tail dependence but not lower tail dependence.</li>
-</ul>
-<p>General Formula: $C(u,v;\theta) &#x3D; \exp\left( -\left[ (-\log u)^\theta + (-\log v)^\theta \right]^{1&#x2F;\theta} \right)$</p>
-<p>Conditional Copulas (Skip): Gumbel copula does not have an explicit expression. Instead, we may use numerical method to simulate.</p>
-<p><img src="/en/../images/5/gumCo.png" alt="$\theta = 3$"></p>
-<h3 id="3-Clayton-Copula"><a href="#3-Clayton-Copula" class="headerlink" title="3, Clayton Copula"></a>3, Clayton Copula</h3><ul>
-<li><strong>Asymmetry</strong>: Clayton copulas are asymmetric, with more weight on the joint lower tails, indicating that they capture the events where both variables achieve low values together.</li>
-<li><strong>Lower Tail Dependence</strong>: It exhibits strong lower tail dependence but no upper tail dependence.</li>
-</ul>
-<p>General Formula: $C(u,v;\theta) &#x3D; \left( u^{-\theta} + v^{-\theta} - 1 \right)^{-1&#x2F;\theta}$</p>
-<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; \left( \left(\alpha^{-\theta} - 1 \right) u^{-\theta} + 1 \right)^{-1&#x2F;\theta}$, $1 \leq \theta &lt; \infty$</p>
-<p><img src="/en/../images/5/clayCo.png" alt="$\theta = 5$"></p>
-<h3 id="4-Frank-Copula"><a href="#4-Frank-Copula" class="headerlink" title="4, Frank Copula"></a>4, Frank Copula</h3><ul>
-<li><strong>Symmetry</strong>: Frank copulas are symmetric, treating the dependence in the lower and upper tails equally.</li>
-<li><strong>No Tail Dependence</strong>: Frank copulas do not exhibit tail dependence, similar to Gaussian copulas.</li>
-</ul>
-<p>General Formula: $C(u,v;\theta) &#x3D; -\frac{1}{\theta} \ln\left( 1 + \frac{(e^{-\theta u} - 1)(e^{-\theta v} - 1)}{e^{-\theta} - 1} \right)$</p>
-<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; -\frac{1}{\theta} \ln \left( 1 - \frac{\alpha (1 - \exp(-\theta))}{\exp(-\theta u) + \alpha (1 - \exp(-\theta u))} \right)$, $\theta \in \mathbb{R} \backslash \{0\}$</p>
-<p><img src="/en/../images/5/frankCo.png" alt="$\theta = 10$"></p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Feel tedious, right? So, let’s just forget everything above, and just remember: </p>
-<ol>
-<li>“Copula(s)” refers a family of functions that help us understand how different things, like variables or data points, move together or relate to each other, despite having their own unique behaviors.</li>
-<li>Sklar’s Theorem ensures the existence and uniqueness of copulas for continuous marginal CDFs.</li>
-</ol>
-<p>I also wanted to write some applications for Copulas, but I figured out that I’ve written too long for the boring mathematics stuff. Let’s finish this in the next post, and see you soon~</p>
-]]></content>
-      <categories>
-        <category>Mathematics</category>
-      </categories>
-      <tags>
-        <tag>Probability</tag>
-        <tag>Mathematics</tag>
-        <tag>Machine Learning</tag>
-        <tag>Linear &amp; Nonlinear Analysis</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Simple NLP — Sentiment Analysis</title>
     <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
     <content><![CDATA[<blockquote>
@@ -1072,6 +991,87 @@ pipe<span class="token punctuation">(</span><span class="token string">'Today I 
       <tags>
         <tag>Probability</tag>
         <tag>Mathematics</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Copula II — Definition</title>
+    <url>/en/2024/03/15/5_2024-03-13-CopulasII-Definition/</url>
+    <content><![CDATA[<p>The word <strong><a href="https://en.wikipedia.org/wiki/Copula_(linguistics)">Copula</a></strong> derives from the Latin noun for a “link” or “tie” that connects two different things. When I talk about Copula in this post, actually I mean the <a href="https://en.wikipedia.org/wiki/Copula_(probability_theory)">Sklar’s Theorem</a>. </p>
+<p>Here is what the Sklar’s Theorem tells us: we always can find a <em>Copula function</em> \(C\) that every multivariate (a.k.a joint) cumulative distribution function(CDF) can be expressed by its marginal CDFs. In other words, we can use copula function to analyze the dependence between each random variable, and Sklar’s Theorem ensures such copula function exists.</p>
+<h2 id="Copula-Sklar’s-Theorem"><a href="#Copula-Sklar’s-Theorem" class="headerlink" title="Copula &amp; Sklar’s Theorem"></a>Copula &amp; Sklar’s Theorem</h2><blockquote>
+<p><strong>Definition</strong>: A \(\textbf{copula}\) is a function \(C: [0, 1]^n \rightarrow [0, 1]\) with the following properties: </p>
+<ul>
+<li><p>For every \(u_1, u_2, \ldots, u_n \in [0, 1]\), \(C(1, 1, \ldots, u_i, \ldots, 1) &#x3D; u_i\). </p>
+</li>
+<li><p>For every \(u_1, u_2, \ldots, u_n \in [0, 1]\), if any \(u_i &#x3D; 0\), then \(C(u_1, u_2, \ldots, u_n) &#x3D; 0\). </p>
+</li>
+<li><p>\(C\) is \(\textbf{n-increasing}\), meaning that for any \(a_1 \leq b_1, a_2 \leq b_2, \ldots, a_n \leq b_n\) in \([0, 1]\), the C-volume of the n-dimensional interval \([a_1, b_1] \times [a_2, b_2] \times \ldots \times [a_n, b_n]\) is nonnegative. That is,  $$\begin{equation} \Delta C \geq 0, \end{equation}$$ where $\Delta C$ is the C-volume, a difference of values of $C$ that resembles a high-dimensional version of the finite difference. </p>
+<blockquote>
+<p>Note: Given a copula $C: [0, 1]^n \rightarrow [0, 1]$, the $\Delta C$ for a box defined by the intervals $[a_1, b_1], [a_2, b_2], \ldots, [a_n, b_n]$ in $[0, 1]^n$ is calculated as follows: $$\begin{equation} \Delta C &#x3D; \sum_{(i_1, i_2, \ldots, i_n) \in {0,1}^n} (-1)^{i_1 + i_2 + \cdots + i_n} C\left(b_1^{(i_1)}, b_2^{(i_2)}, \ldots, b_n^{(i_n)}\right), \end{equation}$$ where $b_j^{(i_j)} &#x3D; a_j$ if $i_j &#x3D; 0$ and $b_j^{(i_j)} &#x3D; b_j$ if $i_j &#x3D; 1$ for $1 \leq j \leq n$. This formula applies the inclusion-exclusion principle to calculate the volume under the copula over the specified box.</p>
+<p>Consider a 2-dimensional copula $C: [0, 1]^2 \rightarrow [0, 1]$. To calculate the $\Delta C$ for a box in $[0, 1]^2$ defined by the intervals $[a_1, b_1]$ and $[a_2, b_2]$, we use the formula: \begin{equation} \Delta C &#x3D; C(b_1, b_2) - C(a_1, b_2) - C(b_1, a_2) + C(a_1, a_2). \end{equation} This represents the inclusion-exclusion principle in 2 dimensions, ensuring that we correctly account for the volume under $C$ over the box by subtracting and adding the values of $C$ at the corners of the box. </p>
+<p>In one word, we just want to make sure the volume inside the squre (\([0, 1] \times[0,1]\)) is positive. (Review the probability from joint CDF. For example, \(P(a_1&lt;X&lt;a_2, b_1&lt;Y&lt;b_2)\))</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Sklar’s Theorem</strong>: For any joint distribution function \(H\) of random variables \(X_1, X_2, \ldots, X_n\) with marginal distribution functions \(F_1, F_2, \ldots, F_n\), there <strong>exists</strong> a copula \(C: [0, 1]^n \rightarrow [0, 1]\) such that for all \(x_1, x_2, \ldots, x_n\) in the extended real line (\(\overline{\mathbb{R}}\) or \(\mathbb{R} \cup \{-\infty,\infty\}\)), $$\begin{equation} H(x_1, x_2, \ldots, x_n) &#x3D; C(F_1(x_1), F_2(x_2), \ldots, F_n(x_n)). \end{equation}$$ Furthermore, if the marginal distribution functions \(F_1, F_2, \ldots, F_n\) are continuous, then the copula \(C\) is <strong>unique</strong>. This means that the joint distribution \(H\) can be fully specified by its marginals and the copula \(C\).</p>
+<blockquote>
+<p><strong>Brief Proof</strong>: Currently, we only consider continuous case (CDF can be discontinuous, but that requires lots of math, and I don’t understand it 🙃. It I think is necessary, I may update in the future though I think continuous case is enough for most scenarios).</p>
+<ol>
+<li><p><strong>existence</strong>: Here, we use the definition of generalized inverse distribution function where </p>
+<p>$$F^{-1}_X(y) &#x3D; \inf\{x : F_X(x) \geq y\}, \quad  0 \leq y \leq 1.$$</p>
+<p>By <a href="https://zcpisme.github.io/en/2024/03/10/4_Probability%20%E2%80%94%20Probability%20Integral%20Transform/">Probability Integral Transform</a>, we know $U_i &#x3D; F_i(X_i)$ is normally distributed on $[0,1]$ for $i &#x3D; 1, 2,…,n$. We can easily construct copula function $C : [0, 1]^n \rightarrow [0, 1]$ s.t</p>
+<p>$$C(u_1, u_2, …, u_n) &#x3D; H(F^{-1}_1, F^{-1}_2,…, F^{-1}_n).$$</p>
+<p>Here, $C(1,…,1,u_i,1,…,1) &#x3D; u_i$ and $C(u_1,…,u_{i-1},0 ,u_{i+1},…,u_n) &#x3D; 0$ are obvious because it just means marginal CDF or the probability of a single point, which is 0. Also, $C$ is $n$-increasing because we define it from CDFs, which is non-negative for sure.</p>
+</li>
+<li><p><strong>uniqueness</strong>(skip): Simply because the continuous marginal CDF is one-to-one (bijective) function, so each copula has to follow same “mapping way” to connect marginal CDFs and joint CDF.</p>
+</li>
+</ol>
+</blockquote>
+</blockquote>
+<h2 id="Type-of-Copulas"><a href="#Type-of-Copulas" class="headerlink" title="Type of Copulas"></a>Type of Copulas</h2><p>Theoretically, there are infinite types of Copula functions based on different distributions. I’ll introduce some common Copulas in bivariate distribution.</p>
+<h3 id="1-Gaussian-Copula"><a href="#1-Gaussian-Copula" class="headerlink" title="1, Gaussian Copula"></a>1, Gaussian Copula</h3><ul>
+<li><strong>Symmetry</strong>: Gaussian copulas are symmetric, meaning they assign equal probability to joint tail events.</li>
+<li><strong>No Tail Dependence</strong>: Gaussian copulas do not have tail dependence, implying that they underestimate the probability of extreme co-movements.</li>
+</ul>
+<p>General Formula: $C(u,v;\theta) &#x3D; \Phi_{\theta}(\Phi^{-1}(u), \Phi^{-1}(v))$</p>
+<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; \Phi \left( \Phi^{-1}(\alpha) \sqrt{1-\theta^2} + \theta\Phi^{-1}(u) \right)$, $\theta \in [-1,1]$</p>
+<p><img src="/en/../images/5/gauCo.png" alt="$\theta = 0.7$"></p>
+<h3 id="2-Gumbel-Copula"><a href="#2-Gumbel-Copula" class="headerlink" title="2, Gumbel Copula"></a>2, Gumbel Copula</h3><ul>
+<li><strong>Asymmetry</strong>: The Gumbel copula is asymmetric, with more weight on the joint upper tails, capturing the events where both variables achieve high values together.</li>
+<li><strong>Upper Tail Dependence</strong>: It exhibits upper tail dependence but not lower tail dependence.</li>
+</ul>
+<p>General Formula: $C(u,v;\theta) &#x3D; \exp\left( -\left[ (-\log u)^\theta + (-\log v)^\theta \right]^{1&#x2F;\theta} \right)$</p>
+<p>Conditional Copulas (Skip): Gumbel copula does not have an explicit expression. Instead, we may use numerical method to simulate.</p>
+<p><img src="/en/../images/5/gumCo.png" alt="$\theta = 3$"></p>
+<h3 id="3-Clayton-Copula"><a href="#3-Clayton-Copula" class="headerlink" title="3, Clayton Copula"></a>3, Clayton Copula</h3><ul>
+<li><strong>Asymmetry</strong>: Clayton copulas are asymmetric, with more weight on the joint lower tails, indicating that they capture the events where both variables achieve low values together.</li>
+<li><strong>Lower Tail Dependence</strong>: It exhibits strong lower tail dependence but no upper tail dependence.</li>
+</ul>
+<p>General Formula: $C(u,v;\theta) &#x3D; \left( u^{-\theta} + v^{-\theta} - 1 \right)^{-1&#x2F;\theta}$</p>
+<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; \left( \left(\alpha^{-\theta} - 1 \right) u^{-\theta} + 1 \right)^{-1&#x2F;\theta}$, $1 \leq \theta &lt; \infty$</p>
+<p><img src="/en/../images/5/clayCo.png" alt="$\theta = 5$"></p>
+<h3 id="4-Frank-Copula"><a href="#4-Frank-Copula" class="headerlink" title="4, Frank Copula"></a>4, Frank Copula</h3><ul>
+<li><strong>Symmetry</strong>: Frank copulas are symmetric, treating the dependence in the lower and upper tails equally.</li>
+<li><strong>No Tail Dependence</strong>: Frank copulas do not exhibit tail dependence, similar to Gaussian copulas.</li>
+</ul>
+<p>General Formula: $C(u,v;\theta) &#x3D; -\frac{1}{\theta} \ln\left( 1 + \frac{(e^{-\theta u} - 1)(e^{-\theta v} - 1)}{e^{-\theta} - 1} \right)$</p>
+<p>Conditional Copulas: $C_{2|1}^{-1}{ \alpha | u } &#x3D; -\frac{1}{\theta} \ln \left( 1 - \frac{\alpha (1 - \exp(-\theta))}{\exp(-\theta u) + \alpha (1 - \exp(-\theta u))} \right)$, $\theta \in \mathbb{R} \backslash \{0\}$</p>
+<p><img src="/en/../images/5/frankCo.png" alt="$\theta = 10$"></p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Feel tedious, right? So, let’s just forget everything above, and just remember: </p>
+<ol>
+<li>“Copula(s)” refers a family of functions that help us understand how different things, like variables or data points, move together or relate to each other, despite having their own unique behaviors.</li>
+<li>Sklar’s Theorem ensures the existence and uniqueness of copulas for continuous marginal CDFs.</li>
+</ol>
+<p>I also wanted to write some applications for Copulas, but I figured out that I’ve written too long for the boring mathematics stuff. Let’s finish this in the next post, and see you soon~</p>
+]]></content>
+      <categories>
+        <category>Mathematics</category>
+      </categories>
+      <tags>
+        <tag>Probability</tag>
+        <tag>Mathematics</tag>
+        <tag>Machine Learning</tag>
+        <tag>Linear &amp; Nonlinear Analysis</tag>
       </tags>
   </entry>
   <entry>
