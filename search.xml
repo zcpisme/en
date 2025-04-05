@@ -105,6 +105,276 @@
       </tags>
   </entry>
   <entry>
+    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
+    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
+</blockquote>
+<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
+<p>Tools used:</p>
+<ul>
+<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
+<li><strong>Git</strong></li>
+<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
+</ul>
+<hr>
+<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
+<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
+<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
+<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
+<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
+</li>
+</ol>
+<hr>
+<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
+<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
+<p>To configure swap space:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
+<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
+<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
+<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
+<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
+/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
+<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
+<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
+CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
+]]></content>
+      <categories>
+        <category>Dify</category>
+      </categories>
+      <tags>
+        <tag>Dify</tag>
+        <tag>Anime</tag>
+        <tag>Rem!</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker Usage and Configuration</title>
+    <url>/en/2025/01/12/15_2025-01-12-Docker%20Deployment/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2025/01/12/15_2025-01-12-Docker%E9%83%A8%E7%BD%B2/">original chinese page</a>.</p>
+</blockquote>
+<p>Come try one-click foolproof distribution and become a Docker expert! In software development, whenever you encounter CI&#x2F;CD concepts, Docker is indispensable.</p>
+<h1 id="Docker-Basic-Concepts"><a href="#Docker-Basic-Concepts" class="headerlink" title="Docker Basic Concepts"></a>Docker Basic Concepts</h1><h2 id="1-Docker-Introduction"><a href="#1-Docker-Introduction" class="headerlink" title="1. Docker Introduction"></a>1. <strong>Docker Introduction</strong></h2><p>Docker is an open-source containerization technology that can package applications and all their dependencies into a portable container. Through Docker, you can ensure application consistency across different environments (development, testing, production), solving the “it works on my machine” problem.</p>
+<h2 id="2-Docker-Basic-Concepts"><a href="#2-Docker-Basic-Concepts" class="headerlink" title="2. Docker Basic Concepts"></a>2. <strong>Docker Basic Concepts</strong></h2><ol>
+<li><strong>Image</strong>:<ul>
+<li>Similar to an application template, containing all the environments needed to run the application (such as operating system, runtime, libraries, application code, etc.).</li>
+<li>Images are immutable, similar to virtual machine snapshots.</li>
+</ul>
+</li>
+<li><strong>Container</strong>:<ul>
+<li>An instantiated running environment based on an image. Each container is an independent sandbox containing the application and all dependencies.</li>
+<li>Containers are lightweight, start quickly, and use fewer resources.</li>
+</ul>
+</li>
+<li><strong>Dockerfile</strong>:<ul>
+<li>A script file used to define how to build images (including operating system, dependency installation, program code, etc.).</li>
+<li>Similar to virtual machine configuration files.</li>
+</ul>
+</li>
+<li><strong>Docker Hub</strong>:<ul>
+<li>A public image repository, similar to code hosting platforms (like GitHub). You can download or push images to Docker Hub.</li>
+</ul>
+</li>
+<li><strong>Network</strong>:<ul>
+<li>Docker provides container intercommunication functionality, allowing containers to connect through networks.</li>
+<li>The default network mode is <code>bridge</code>, where all containers connect to a virtual bridge.</li>
+</ul>
+</li>
+<li><strong>Volume</strong>:<ul>
+<li>Used for data persistence, saving container internal data to the host machine’s file system, preventing data loss after container deletion.</li>
+</ul>
+</li>
+</ol>
+<h2 id="3-Docker-Basic-Operations"><a href="#3-Docker-Basic-Operations" class="headerlink" title="3. Docker Basic Operations"></a>3. <strong>Docker Basic Operations</strong></h2><h4 id="Image-Related"><a href="#Image-Related" class="headerlink" title="Image Related"></a><strong>Image Related</strong></h4><ol>
+<li><p><strong>Pull Image</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker pull &lt;image-name>:&lt;tag><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Example:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker pull python:3<span class="token punctuation">.</span>9<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>View Local Images</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker images<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Delete Image</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker rmi &lt;image-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h4 id="Container-Related"><a href="#Container-Related" class="headerlink" title="Container Related"></a><strong>Container Related</strong></h4><ol>
+<li><p><strong>Run Container</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker run <span class="token operator">-</span>d <span class="token operator">-</span>p 8000:8000 &lt;image-name><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Parameter explanation:</p>
+<ul>
+<li><p><code>-d</code>: Run container in background.</p>
+</li>
+<li><p><code>-p</code>: Map container port to host port (e.g., <code>8000:8000</code>).</p>
+</li>
+<li><p>Example:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker run <span class="token operator">-</span>d <span class="token operator">-</span>p 8080:80 nginx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ul>
+</li>
+<li><p><strong>View Running Containers</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">ps</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>View All Containers (Including Stopped)</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">ps</span> <span class="token operator">-</span>a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Stop Container</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker stop &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Delete Container</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">rm</span> &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h4 id="Other-Commands"><a href="#Other-Commands" class="headerlink" title="Other Commands"></a><strong>Other Commands</strong></h4><ol>
+<li><p><strong>Enter Container</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker exec <span class="token operator">-</span>it &lt;container-ID> <span class="token operator">/</span>bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Example:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker exec <span class="token operator">-</span>it my-container <span class="token operator">/</span>bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>View Container Logs</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker logs &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Clean Unused Images and Containers</strong>:</p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker system prune <span class="token operator">-</span>a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h1 id="Docker-Deployment"><a href="#Docker-Deployment" class="headerlink" title="Docker Deployment"></a>Docker Deployment</h1><h2 id="1-Dockerfile-Purpose"><a href="#1-Dockerfile-Purpose" class="headerlink" title="1. Dockerfile Purpose"></a>1. <strong>Dockerfile Purpose</strong></h2><h3 id="What-is-Dockerfile"><a href="#What-is-Dockerfile" class="headerlink" title="What is Dockerfile?"></a><strong>What is Dockerfile?</strong></h3><p>Dockerfile is a text file used to define how to build a Docker image. It contains information about the base image, dependency installation, file copying, and running commands.</p>
+<hr>
+<h3 id="Dockerfile-Basic-Structure"><a href="#Dockerfile-Basic-Structure" class="headerlink" title="Dockerfile Basic Structure"></a><strong>Dockerfile Basic Structure</strong></h3><p>Here’s a standard Dockerfile example:</p>
+<pre class="line-numbers language-docker" data-language="docker"><code class="language-docker"><span class="token comment"># Use official base image</span>
+<span class="token instruction"><span class="token keyword">FROM</span> python:3.11-slim</span>
+
+<span class="token comment"># Set working directory</span>
+<span class="token instruction"><span class="token keyword">WORKDIR</span> /app</span>
+
+<span class="token comment"># Copy project dependency files</span>
+<span class="token instruction"><span class="token keyword">COPY</span> requirements.txt .</span>
+
+<span class="token comment"># Install dependencies</span>
+<span class="token instruction"><span class="token keyword">RUN</span> pip install --no-cache-dir -r requirements.txt</span>
+
+<span class="token comment"># Copy application code</span>
+<span class="token instruction"><span class="token keyword">COPY</span> app/ ./app</span>
+
+<span class="token comment"># Expose application port</span>
+<span class="token instruction"><span class="token keyword">EXPOSE</span> 8000</span>
+
+<span class="token comment"># Run application</span>
+<span class="token instruction"><span class="token keyword">CMD</span> [<span class="token string">"uvicorn"</span>, <span class="token string">"app.main:app"</span>, <span class="token string">"--host"</span>, <span class="token string">"0.0.0.0"</span>, <span class="token string">"--port"</span>, <span class="token string">"8000"</span>]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h3 id="Key-Instructions-in-Dockerfile"><a href="#Key-Instructions-in-Dockerfile" class="headerlink" title="Key Instructions in Dockerfile"></a><strong>Key Instructions in Dockerfile</strong></h3><ul>
+<li><code>FROM</code>: Specify base image (e.g., <code>python:3.11-slim</code>).</li>
+<li><code>WORKDIR</code>: Set working directory in container.</li>
+<li><code>COPY</code>: Copy local files to image.</li>
+<li><code>RUN</code>: Execute commands during image build (e.g., install dependencies).</li>
+<li><code>EXPOSE</code>: Declare ports container will use.</li>
+<li><code>CMD</code>: Specify command to run when container starts.</li>
+</ul>
+<h2 id="2-Docker-Compose-Purpose"><a href="#2-Docker-Compose-Purpose" class="headerlink" title="2. Docker Compose Purpose"></a>2. <strong>Docker Compose Purpose</strong></h2><h3 id="What-is-Docker-Compose"><a href="#What-is-Docker-Compose" class="headerlink" title="What is Docker Compose?"></a><strong>What is Docker Compose?</strong></h3><p>Docker Compose is a tool for defining and managing multi-container applications. Through the <code>docker-compose.yml</code> file, you can start a group of related containers with simple commands.</p>
+<hr>
+<h3 id="Docker-Compose-File-Example"><a href="#Docker-Compose-File-Example" class="headerlink" title="Docker Compose File Example"></a><strong>Docker Compose File Example</strong></h3><p>Here’s an example <code>docker-compose.yml</code> file for deploying an application with a single service:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'3.8'</span>
+
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">simon_says</span><span class="token punctuation">:</span>
+    <span class="token key atrule">build</span><span class="token punctuation">:</span> .
+    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> simon_says_app
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"8000:8000"</span>
+    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> PYTHONUNBUFFERED=1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Key-Parts-Explained"><a href="#Key-Parts-Explained" class="headerlink" title="Key Parts Explained:"></a><strong>Key Parts Explained:</strong></h4><ul>
+<li><code>services</code>: Define a group of container services.</li>
+<li><code>build</code>: Specify build context (current directory <code>.</code>).</li>
+<li><code>container_name</code>: Specify container name.</li>
+<li><code>ports</code>: Define host and container port mapping (e.g., <code>8000:8000</code>).</li>
+<li><code>environment</code>: Configure environment variables.</li>
+</ul>
+<h2 id="3-Docker-Publishing-and-Deployment-Process"><a href="#3-Docker-Publishing-and-Deployment-Process" class="headerlink" title="3. Docker Publishing and Deployment Process"></a><strong>3. Docker Publishing and Deployment Process</strong></h2><h3 id="3-1-Local-Build-and-Testing"><a href="#3-1-Local-Build-and-Testing" class="headerlink" title="3.1 Local Build and Testing"></a><strong>3.1 Local Build and Testing</strong></h3><ol>
+<li><p><strong>Write Dockerfile</strong>: Ensure <code>Dockerfile</code> is correct, defining application build and run steps.</p>
+</li>
+<li><p><strong>Build Image</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> build <span class="token parameter variable">-t</span> simon_says:latest <span class="token builtin class-name">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Run Container</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">-p</span> <span class="token number">8000</span>:8000 simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Test Application</strong>: Access <a href="http://localhost:8000/">http://localhost:8000</a> via browser or command line.</p>
+</li>
+</ol>
+<hr>
+<h3 id="3-2-Using-Docker-Compose"><a href="#3-2-Using-Docker-Compose" class="headerlink" title="3.2 Using Docker Compose"></a><strong>3.2 Using Docker Compose</strong></h3><ol>
+<li><p><strong>Write <code>docker-compose.yml</code></strong>: Ensure service and port configurations are correct.</p>
+</li>
+<li><p><strong>Start Services</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker-compose</span> up <span class="token parameter variable">-d</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Test Application</strong>: Access <a href="http://localhost:8000/">http://localhost:8000</a>.</p>
+</li>
+</ol>
+<hr>
+<h3 id="3-3-Publish-Image-to-Docker-Hub"><a href="#3-3-Publish-Image-to-Docker-Hub" class="headerlink" title="3.3 Publish Image to Docker Hub"></a><strong>3.3 Publish Image to Docker Hub</strong></h3><ol>
+<li><p><strong>Login to Docker Hub</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> login<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Tag Image</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> tag simon_says:latest yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Push to Docker Hub</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> push yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<hr>
+<h3 id="3-4-Remote-Deployment"><a href="#3-4-Remote-Deployment" class="headerlink" title="3.4 Remote Deployment"></a><strong>3.4 Remote Deployment</strong></h3><ol>
+<li><p><strong>Pull Image on Remote Server</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> pull yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li><p><strong>Run Image</strong></p>
+<ol>
+<li>Direct Run:</li>
+</ol>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">-p</span> <span class="token number">8000</span>:8000 yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<ol start="2">
+<li><p>Using Docker Compose:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'3.8'</span>
+
+<span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">simon_says</span><span class="token punctuation">:</span>
+    <span class="token key atrule">image</span><span class="token punctuation">:</span> yourusername/simon_says<span class="token punctuation">:</span>latest
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token string">"8000:8000"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre><code class="bash">docker-compose up -d
+</code></pre>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>CI/CD</category>
+      </categories>
+      <tags>
+        <tag>DevOps</tag>
+        <tag>Continuous Integration</tag>
+        <tag>Continuous Delivery</tag>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Commonly Used Commands</title>
     <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
     <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
@@ -220,203 +490,6 @@ tree                   <span class="token comment"># Show directory structure as
         <tag>Linux</tag>
         <tag>Git</tag>
         <tag>common commands</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hexo + Github Personal Website Buildup</title>
-    <url>/en/2024/03/04/1_2024-03-03-Hexo%20+%20Github%20Personal%20Website%20Creation/</url>
-    <content><![CDATA[<hr>
-<blockquote>
-<p>Translated by ChatGPT</p>
-</blockquote>
-<p>As the first post, let’s talk about how this website was made. I’ve wanted to create a personal website for a long time, but I gave up on the idea due to not knowing too much about it. Otherwise, I would have to start learning some strange JavaScript and CSS related stuff from scratch, which would be too torturous for me. However, while chatting yesterday, a friend mentioned, “Don’t you guys have something like a personal portfolio?” I realized I didn’t, but then I suddenly thought about personal websites again. Remembering that professors during my undergraduate days had their own websites, I searched for content related to “personal website creation” again. Surprisingly, there were ready-to-use libraries available, like Hexo, even equipped with various themes. Times have changed, and now everything has become so easy, everything can be generated with one click.</p>
-<p>Thank you, open-source hero.</p>
-<h2 id="First-Step-Configuring-Github"><a href="#First-Step-Configuring-Github" class="headerlink" title="First Step: Configuring Github"></a>First Step: Configuring Github</h2><p>The reason for using Github is simple; for individual users, it provides a free user page, which can perfectly serve as a personal webpage.</p>
-<h3 id="Registering-on-Github"><a href="#Registering-on-Github" class="headerlink" title="Registering on Github"></a>Registering on Github</h3><p>This step is omitted，many tutorial can be found online.</p>
-<h3 id="Generating-id-rsa-and-id-rsa-pub-locally"><a href="#Generating-id-rsa-and-id-rsa-pub-locally" class="headerlink" title="Generating id_rsa and id_rsa.pub locally"></a>Generating id_rsa and id_rsa.pub locally</h3><p>Open a CMD terminal (or Windows PowerShell is recommended), and enter the following commands in sequence</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;Github username&quot;
-git config --global user.email &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#x7a;&#99;&#x70;&#x69;&#x73;&#x6d;&#x65;&#64;&#x75;&#x63;&#x68;&#105;&#99;&#x61;&#103;&#111;&#x2e;&#x65;&#x64;&#117;">&#x7a;&#99;&#x70;&#x69;&#x73;&#x6d;&#x65;&#64;&#x75;&#x63;&#x68;&#105;&#99;&#x61;&#103;&#111;&#x2e;&#x65;&#x64;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
-git config --global user.email &quot;zcpisme@uchicago.edu&quot;
-ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>Press Enter, and if prompted with y&#x2F;n, type y and press Enter again</p>
-<p>The result is as shown in the image</p>
-<p><img src="/en/../images/1/1_rsakey.png"></p>
-<p>Open the generated id_rsa.pub with Notepad and copy its contents (located on my computer at C:\Users\12427.ssh)</p>
-<p><img src="/en/../images/1/1_rsakey2.png"></p>
-<h3 id="Linking-Github-Account"><a href="#Linking-Github-Account" class="headerlink" title="Linking Github Account"></a>Linking Github Account</h3><p><img src="/en/../images/1/1_gitrsa.png"></p>
-<p>Navigate to your GitHub account —&gt; Settings —&gt; SSH and GPG keys — new SSH key</p>
-<p><img src="/en/../images/1/1_gitrsa2.png"></p>
-<p><img src="/en/../images/1/1_gitrsa3.png"></p>
-<p>For the title, you can choose any name (your email is recommended), and paste the content from the id_rsa.pub you copied earlier into the key section.</p>
-<p>With this, the connection to Github is complete.</p>
-<h3 id="Create-a-Repository-Named-username-github-io"><a href="#Create-a-Repository-Named-username-github-io" class="headerlink" title="Create a Repository Named username.github.io"></a>Create a Repository Named username.github.io</h3><p>At the top right corner, click on the plus sign and select New repository</p>
-<p><img src="/en/../images/1/1_gitio.png"></p>
-<p>For the repository name, enter “yourusername.github.io” <strong>!!! Important: It must be your username followed by .github.io, and each person can only have one such repository, which must be set to public</strong>, then click create repository at the bottom</p>
-<p><img src="/en/../images/1/1_gitio2.png"></p>
-<p>With this, the GitHub setup is complete.</p>
-<h2 id="Step-1-5-Having-Node-js"><a href="#Step-1-5-Having-Node-js" class="headerlink" title="Step 1.5: Having Node.js"></a>Step 1.5: Having Node.js</h2><p>Some might complain, “Ah, zcp, why are you being so verbose?” I say, hold on, my goal is to provide step-by-step instructions, and I also fear that I might forget how to start from scratch and organize tutorials from the web later, so being verbose is better. But for this part, it’s just to inform everyone that it exists and won’t be elaborated on here.</p>
-<p>Node.js is a JavaScript runtime environment, and our subsequent configurations will rely on it.</p>
-<p>For installation tutorials, refer to:</p>
-<p><a href="https://nodejs.org/en">https://nodejs.org/en</a></p>
-<p><a href="https://www.runoob.com/nodejs/nodejs-install-setup.html">https://www.runoob.com/nodejs/nodejs-install-setup.html</a></p>
-<p>Basically, just download and install the MSI image file.</p>
-<p>After installation, you can check if it was successful by entering in cmd:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">npm -v<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/en/../images/1/1_nodejs.png"></p>
-<h2 id="Step-2-Your-First-Hexo-Personal-Webpage"><a href="#Step-2-Your-First-Hexo-Personal-Webpage" class="headerlink" title="Step 2: Your First Hexo Personal Webpage"></a>Step 2: Your First Hexo Personal Webpage</h2><p>Here we go! With the above configurations, everything that follows becomes foolproof. You neither have to hand-code the webpage yourself nor need any programming knowledge.</p>
-<p>After the previous step, we can use <strong>npm</strong> to manage packages in node.js.</p>
-<h3 id="Installing-Hexo"><a href="#Installing-Hexo" class="headerlink" title="Installing Hexo"></a>Installing Hexo</h3><p>Enter the following command:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">npm install hexo-cli -g<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<h3 id="Initializing-Hexo"><a href="#Initializing-Hexo" class="headerlink" title="Initializing Hexo"></a>Initializing Hexo</h3><p>For example, if I want to create a folder called myFirstBlog in D:\desktop\campus\personalBlog to manage my webpage, enter this folder in cmd:</p>
-<p><img src="/en/../images/1/1_enterfolder.png"></p>
-<p>Enter:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo init myFirstBlog<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>As you can see, myFirstBlog has been created.</p>
-<p><img src="/en/../images/1/1_enterfolder2.png"></p>
-<h3 id="Launching-Your-Personal-Website"><a href="#Launching-Your-Personal-Website" class="headerlink" title="Launching Your Personal Website"></a>Launching Your Personal Website</h3><p>Start the server in the folder you just created:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo s<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/en/../images/1/1_starthexo.png"></p>
-<p>You can also specify a port with hexo -s -p 4001 for debugging multiple sites (the default port is 4000).</p>
-<p>Copy <a href="http://localhost:4000/">http://localhost:4000/</a> into your browser, and you can (locally) preview your site.</p>
-<p><strong>Congratulations! You now have your own website!</strong><img src="/en/../images/1/1_starthexo2.png"></p>
-<h2 id="Step-3-Hold-on-a-Moment-Publishing-to-Github"><a href="#Step-3-Hold-on-a-Moment-Publishing-to-Github" class="headerlink" title="Step 3: Hold on a Moment (Publishing to Github)"></a>Step 3: Hold on a Moment (Publishing to Github)</h2><p>Of course, we can’t limit ourselves to local previews. We need to publish our webpage to the public internet so that everyone can view it. To do this, follow the configuration steps below.</p>
-<h3 id="Configuring-the-config-yml-File"><a href="#Configuring-the-config-yml-File" class="headerlink" title="Configuring the _config.yml File"></a>Configuring the _config.yml File</h3><p>In the myFirstBlog folder created earlier, there is a file named _config.yml. Open this file with Notepad. Scroll to the very bottom to the #Deployment section, set type to git, repo to the URL of your initial repository followed by .git, and branch to master. For example:</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd"># Deployment
-## Docs: https:&#x2F;&#x2F;hexo.io&#x2F;docs&#x2F;one-command-deployment
-deploy:
-  type: git
-  repo: https:&#x2F;&#x2F;github.com&#x2F;zcpisme&#x2F;zcpisme.github.io.git
-  branch: master<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="Publishing"><a href="#Publishing" class="headerlink" title="Publishing"></a>Publishing</h3><p>The last step, in the cmd (still inside the myFirstBlog folder), enter</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo clean
-hexo g
-hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>Wait for the files to upload to GitHub. After a few minutes, username.github.io will be your personal webpage!</p>
-<p><img src="/en/../images/1/1_gitiofinal.png"></p>
-<p>Isn’t it as easy as ABC~</p>
-<h3 id="Common-Hexo-Commands"><a href="#Common-Hexo-Commands" class="headerlink" title="Common Hexo Commands"></a>Common Hexo Commands</h3><pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo init [folder] # Initialize hexo
-hexo new [layout] &lt;title&gt; # Create a new post, all posts need to be in markdown (.md) format, by default located in .&#x2F;source&#x2F;_post folder
-hexo generate # Generate static files, same as hexo g
-hexo server # Start local server, same as hexo s
-hexo deploy # Deploy website, same as hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h3><p>In personal use, changing and deploying repeatedly, entering commands one by one can be cumbersome (and you might even miss a step). So, you can create a sh script, and run it each time.</p>
-<p>For example, inside the myFirstBlog folder, create a new Notepad document, enter</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
-
-<span class="token comment"># Stop script on any error</span>
-<span class="token builtin class-name">set</span> <span class="token parameter variable">-e</span>
-
-<span class="token comment"># Navigate to the Hexo project directory (if not already there)</span>
-
-<span class="token comment"># Clean the public directory</span>
-<span class="token builtin class-name">echo</span> <span class="token string">"Cleaning..."</span>
-hexo clean
-
-<span class="token comment"># Generate static files</span>
-<span class="token builtin class-name">echo</span> <span class="token string">"Generating..."</span>
-hexo generate
-
-<span class="token comment"># Deploy to the server</span>
-<span class="token builtin class-name">echo</span> <span class="token string">"Deploying..."</span>
-hexo deploy
-
-<span class="token builtin class-name">echo</span> <span class="token string">"Deployment successful!"</span>
-
-<span class="token builtin class-name">echo</span> <span class="token string">"Press enter to close"</span>
-<span class="token builtin class-name">read</span> <span class="token parameter variable">-r</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Rename the file to deploy.sh, before deploying enter</p>
-<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">.&#x2F;deploy.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<h2 id="Step-Wait-a-Bit-Longer-Optional"><a href="#Step-Wait-a-Bit-Longer-Optional" class="headerlink" title="Step ?: Wait a Bit Longer (Optional)"></a>Step ?: Wait a Bit Longer (Optional)</h2><p>Perhaps some friends are very excited to open the webpage and admire it. Then, they find the webpage design so monotonous, secretly cursing: “This is cheating, cheap goods are not good.” I sneezed twice in front of the screen and said, hold on, again.</p>
-<p>Of course, that’s not the case. The real fun part is coming. There are so many people in the world who contribute out of passion, leading to a wide variety of themes available for Hexo to choose from.</p>
-<p>Here at <a href="https://hexo.io/themes/index.html">Hexo Themes</a> you can pick a theme to your liking, from simple styles to elaborate designs. Currently, <a href="https://theme-next.js.org/docs/">NexT</a> is popular for its simplicity and extensive customization plugins. Here, we’ll choose <a href="https://github.com/blinkfox/hexo-theme-matery?tab=readme-ov-file">hexo-theme-matery</a>, a very beautiful theme. Again, thanks to the open-source heroes, and thank you <a href="https://github.com/blinkfox">Blinkfox</a>.</p>
-<p>After choosing a theme, download the source files (git clone) and copy the downloaded files to the <strong>themes</strong> folder under myFirstBlog.</p>
-<p>Similarly, in the _config.yml configuration file, change the theme to the name of the folder you just downloaded, for example,</p>
-<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># Extensions</span>
-<span class="token comment">## Plugins: https://hexo.io/plugins/</span>
-<span class="token comment">## Themes: https://hexo.io/themes/</span>
-<span class="token key atrule">theme</span><span class="token punctuation">:</span> hexo<span class="token punctuation">-</span>theme<span class="token punctuation">-</span>matery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Publish again, and you can see the webpage theme has become fancier. Usually, each theme has its own detailed documentation.</p>
-<h2 id="Conclusion-of-This-Article"><a href="#Conclusion-of-This-Article" class="headerlink" title="Conclusion of This Article"></a>Conclusion of This Article</h2><p>Exploring an unknown thing is joyful, and there is immense pleasure in the heart when succeeding after repeated trials and errors.</p>
-<p>Thank you for reading my first article, please be forgiving, and suggestions are welcome!</p>
-<p>In the next article, we will talk about some additional settings I have for the matery theme.</p>
-]]></content>
-      <categories>
-        <category>Personal Website</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-        <tag>Github</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
-    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
-    <content><![CDATA[<blockquote>
-<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
-</blockquote>
-<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
-<p>Tools used:</p>
-<ul>
-<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
-<li><strong>Git</strong></li>
-<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
-</ul>
-<hr>
-<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
-<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
-<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
-<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
-<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
-</li>
-</ol>
-<hr>
-<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
-<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
-<p>To configure swap space:</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
-<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
-<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
-<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
-<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
-/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
-<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
-<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
-CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
-]]></content>
-      <categories>
-        <category>Dify</category>
-      </categories>
-      <tags>
-        <tag>Dify</tag>
-        <tag>Anime</tag>
-        <tag>Rem!</tag>
       </tags>
   </entry>
   <entry>
@@ -638,318 +711,148 @@ hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></sp
       </tags>
   </entry>
   <entry>
-    <title>Docker Usage and Configuration</title>
-    <url>/en/2025/01/12/15_2025-01-12-Docker%20Deployment/</url>
-    <content><![CDATA[<blockquote>
-<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2025/01/12/15_2025-01-12-Docker%E9%83%A8%E7%BD%B2/">original chinese page</a>.</p>
-</blockquote>
-<p>Come try one-click foolproof distribution and become a Docker expert! In software development, whenever you encounter CI&#x2F;CD concepts, Docker is indispensable.</p>
-<h1 id="Docker-Basic-Concepts"><a href="#Docker-Basic-Concepts" class="headerlink" title="Docker Basic Concepts"></a>Docker Basic Concepts</h1><h2 id="1-Docker-Introduction"><a href="#1-Docker-Introduction" class="headerlink" title="1. Docker Introduction"></a>1. <strong>Docker Introduction</strong></h2><p>Docker is an open-source containerization technology that can package applications and all their dependencies into a portable container. Through Docker, you can ensure application consistency across different environments (development, testing, production), solving the “it works on my machine” problem.</p>
-<h2 id="2-Docker-Basic-Concepts"><a href="#2-Docker-Basic-Concepts" class="headerlink" title="2. Docker Basic Concepts"></a>2. <strong>Docker Basic Concepts</strong></h2><ol>
-<li><strong>Image</strong>:<ul>
-<li>Similar to an application template, containing all the environments needed to run the application (such as operating system, runtime, libraries, application code, etc.).</li>
-<li>Images are immutable, similar to virtual machine snapshots.</li>
-</ul>
-</li>
-<li><strong>Container</strong>:<ul>
-<li>An instantiated running environment based on an image. Each container is an independent sandbox containing the application and all dependencies.</li>
-<li>Containers are lightweight, start quickly, and use fewer resources.</li>
-</ul>
-</li>
-<li><strong>Dockerfile</strong>:<ul>
-<li>A script file used to define how to build images (including operating system, dependency installation, program code, etc.).</li>
-<li>Similar to virtual machine configuration files.</li>
-</ul>
-</li>
-<li><strong>Docker Hub</strong>:<ul>
-<li>A public image repository, similar to code hosting platforms (like GitHub). You can download or push images to Docker Hub.</li>
-</ul>
-</li>
-<li><strong>Network</strong>:<ul>
-<li>Docker provides container intercommunication functionality, allowing containers to connect through networks.</li>
-<li>The default network mode is <code>bridge</code>, where all containers connect to a virtual bridge.</li>
-</ul>
-</li>
-<li><strong>Volume</strong>:<ul>
-<li>Used for data persistence, saving container internal data to the host machine’s file system, preventing data loss after container deletion.</li>
-</ul>
-</li>
-</ol>
-<h2 id="3-Docker-Basic-Operations"><a href="#3-Docker-Basic-Operations" class="headerlink" title="3. Docker Basic Operations"></a>3. <strong>Docker Basic Operations</strong></h2><h4 id="Image-Related"><a href="#Image-Related" class="headerlink" title="Image Related"></a><strong>Image Related</strong></h4><ol>
-<li><p><strong>Pull Image</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker pull &lt;image-name>:&lt;tag><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Example:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker pull python:3<span class="token punctuation">.</span>9<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>View Local Images</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker images<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Delete Image</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker rmi &lt;image-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h4 id="Container-Related"><a href="#Container-Related" class="headerlink" title="Container Related"></a><strong>Container Related</strong></h4><ol>
-<li><p><strong>Run Container</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker run <span class="token operator">-</span>d <span class="token operator">-</span>p 8000:8000 &lt;image-name><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Parameter explanation:</p>
-<ul>
-<li><p><code>-d</code>: Run container in background.</p>
-</li>
-<li><p><code>-p</code>: Map container port to host port (e.g., <code>8000:8000</code>).</p>
-</li>
-<li><p>Example:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker run <span class="token operator">-</span>d <span class="token operator">-</span>p 8080:80 nginx<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ul>
-</li>
-<li><p><strong>View Running Containers</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">ps</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>View All Containers (Including Stopped)</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">ps</span> <span class="token operator">-</span>a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Stop Container</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker stop &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Delete Container</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker <span class="token function">rm</span> &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h4 id="Other-Commands"><a href="#Other-Commands" class="headerlink" title="Other Commands"></a><strong>Other Commands</strong></h4><ol>
-<li><p><strong>Enter Container</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker exec <span class="token operator">-</span>it &lt;container-ID> <span class="token operator">/</span>bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Example:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker exec <span class="token operator">-</span>it my-container <span class="token operator">/</span>bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>View Container Logs</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker logs &lt;container-ID><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Clean Unused Images and Containers</strong>:</p>
-<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">docker system prune <span class="token operator">-</span>a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h1 id="Docker-Deployment"><a href="#Docker-Deployment" class="headerlink" title="Docker Deployment"></a>Docker Deployment</h1><h2 id="1-Dockerfile-Purpose"><a href="#1-Dockerfile-Purpose" class="headerlink" title="1. Dockerfile Purpose"></a>1. <strong>Dockerfile Purpose</strong></h2><h3 id="What-is-Dockerfile"><a href="#What-is-Dockerfile" class="headerlink" title="What is Dockerfile?"></a><strong>What is Dockerfile?</strong></h3><p>Dockerfile is a text file used to define how to build a Docker image. It contains information about the base image, dependency installation, file copying, and running commands.</p>
-<hr>
-<h3 id="Dockerfile-Basic-Structure"><a href="#Dockerfile-Basic-Structure" class="headerlink" title="Dockerfile Basic Structure"></a><strong>Dockerfile Basic Structure</strong></h3><p>Here’s a standard Dockerfile example:</p>
-<pre class="line-numbers language-docker" data-language="docker"><code class="language-docker"><span class="token comment"># Use official base image</span>
-<span class="token instruction"><span class="token keyword">FROM</span> python:3.11-slim</span>
-
-<span class="token comment"># Set working directory</span>
-<span class="token instruction"><span class="token keyword">WORKDIR</span> /app</span>
-
-<span class="token comment"># Copy project dependency files</span>
-<span class="token instruction"><span class="token keyword">COPY</span> requirements.txt .</span>
-
-<span class="token comment"># Install dependencies</span>
-<span class="token instruction"><span class="token keyword">RUN</span> pip install --no-cache-dir -r requirements.txt</span>
-
-<span class="token comment"># Copy application code</span>
-<span class="token instruction"><span class="token keyword">COPY</span> app/ ./app</span>
-
-<span class="token comment"># Expose application port</span>
-<span class="token instruction"><span class="token keyword">EXPOSE</span> 8000</span>
-
-<span class="token comment"># Run application</span>
-<span class="token instruction"><span class="token keyword">CMD</span> [<span class="token string">"uvicorn"</span>, <span class="token string">"app.main:app"</span>, <span class="token string">"--host"</span>, <span class="token string">"0.0.0.0"</span>, <span class="token string">"--port"</span>, <span class="token string">"8000"</span>]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<hr>
-<h3 id="Key-Instructions-in-Dockerfile"><a href="#Key-Instructions-in-Dockerfile" class="headerlink" title="Key Instructions in Dockerfile"></a><strong>Key Instructions in Dockerfile</strong></h3><ul>
-<li><code>FROM</code>: Specify base image (e.g., <code>python:3.11-slim</code>).</li>
-<li><code>WORKDIR</code>: Set working directory in container.</li>
-<li><code>COPY</code>: Copy local files to image.</li>
-<li><code>RUN</code>: Execute commands during image build (e.g., install dependencies).</li>
-<li><code>EXPOSE</code>: Declare ports container will use.</li>
-<li><code>CMD</code>: Specify command to run when container starts.</li>
-</ul>
-<h2 id="2-Docker-Compose-Purpose"><a href="#2-Docker-Compose-Purpose" class="headerlink" title="2. Docker Compose Purpose"></a>2. <strong>Docker Compose Purpose</strong></h2><h3 id="What-is-Docker-Compose"><a href="#What-is-Docker-Compose" class="headerlink" title="What is Docker Compose?"></a><strong>What is Docker Compose?</strong></h3><p>Docker Compose is a tool for defining and managing multi-container applications. Through the <code>docker-compose.yml</code> file, you can start a group of related containers with simple commands.</p>
-<hr>
-<h3 id="Docker-Compose-File-Example"><a href="#Docker-Compose-File-Example" class="headerlink" title="Docker Compose File Example"></a><strong>Docker Compose File Example</strong></h3><p>Here’s an example <code>docker-compose.yml</code> file for deploying an application with a single service:</p>
-<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'3.8'</span>
-
-<span class="token key atrule">services</span><span class="token punctuation">:</span>
-  <span class="token key atrule">simon_says</span><span class="token punctuation">:</span>
-    <span class="token key atrule">build</span><span class="token punctuation">:</span> .
-    <span class="token key atrule">container_name</span><span class="token punctuation">:</span> simon_says_app
-    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> <span class="token string">"8000:8000"</span>
-    <span class="token key atrule">environment</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> PYTHONUNBUFFERED=1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="Key-Parts-Explained"><a href="#Key-Parts-Explained" class="headerlink" title="Key Parts Explained:"></a><strong>Key Parts Explained:</strong></h4><ul>
-<li><code>services</code>: Define a group of container services.</li>
-<li><code>build</code>: Specify build context (current directory <code>.</code>).</li>
-<li><code>container_name</code>: Specify container name.</li>
-<li><code>ports</code>: Define host and container port mapping (e.g., <code>8000:8000</code>).</li>
-<li><code>environment</code>: Configure environment variables.</li>
-</ul>
-<h2 id="3-Docker-Publishing-and-Deployment-Process"><a href="#3-Docker-Publishing-and-Deployment-Process" class="headerlink" title="3. Docker Publishing and Deployment Process"></a><strong>3. Docker Publishing and Deployment Process</strong></h2><h3 id="3-1-Local-Build-and-Testing"><a href="#3-1-Local-Build-and-Testing" class="headerlink" title="3.1 Local Build and Testing"></a><strong>3.1 Local Build and Testing</strong></h3><ol>
-<li><p><strong>Write Dockerfile</strong>: Ensure <code>Dockerfile</code> is correct, defining application build and run steps.</p>
-</li>
-<li><p><strong>Build Image</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> build <span class="token parameter variable">-t</span> simon_says:latest <span class="token builtin class-name">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Run Container</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">-p</span> <span class="token number">8000</span>:8000 simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Test Application</strong>: Access <a href="http://localhost:8000/">http://localhost:8000</a> via browser or command line.</p>
-</li>
-</ol>
-<hr>
-<h3 id="3-2-Using-Docker-Compose"><a href="#3-2-Using-Docker-Compose" class="headerlink" title="3.2 Using Docker Compose"></a><strong>3.2 Using Docker Compose</strong></h3><ol>
-<li><p><strong>Write <code>docker-compose.yml</code></strong>: Ensure service and port configurations are correct.</p>
-</li>
-<li><p><strong>Start Services</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker-compose</span> up <span class="token parameter variable">-d</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Test Application</strong>: Access <a href="http://localhost:8000/">http://localhost:8000</a>.</p>
-</li>
-</ol>
-<hr>
-<h3 id="3-3-Publish-Image-to-Docker-Hub"><a href="#3-3-Publish-Image-to-Docker-Hub" class="headerlink" title="3.3 Publish Image to Docker Hub"></a><strong>3.3 Publish Image to Docker Hub</strong></h3><ol>
-<li><p><strong>Login to Docker Hub</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> login<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Tag Image</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> tag simon_says:latest yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Push to Docker Hub</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> push yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<hr>
-<h3 id="3-4-Remote-Deployment"><a href="#3-4-Remote-Deployment" class="headerlink" title="3.4 Remote Deployment"></a><strong>3.4 Remote Deployment</strong></h3><ol>
-<li><p><strong>Pull Image on Remote Server</strong></p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> pull yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-<li><p><strong>Run Image</strong></p>
-<ol>
-<li>Direct Run:</li>
-</ol>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-d</span> <span class="token parameter variable">-p</span> <span class="token number">8000</span>:8000 yourusername/simon_says:latest<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<ol start="2">
-<li><p>Using Docker Compose:</p>
-<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">'3.8'</span>
-
-<span class="token key atrule">services</span><span class="token punctuation">:</span>
-  <span class="token key atrule">simon_says</span><span class="token punctuation">:</span>
-    <span class="token key atrule">image</span><span class="token punctuation">:</span> yourusername/simon_says<span class="token punctuation">:</span>latest
-    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> <span class="token string">"8000:8000"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<pre><code class="bash">docker-compose up -d
-</code></pre>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>CI/CD</category>
-      </categories>
-      <tags>
-        <tag>DevOps</tag>
-        <tag>Continuous Integration</tag>
-        <tag>Continuous Delivery</tag>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Simple NLP — Sentiment Analysis</title>
-    <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
-    <content><![CDATA[<blockquote>
+    <title>Hexo + Github Personal Website Buildup</title>
+    <url>/en/2024/03/04/1_2024-03-03-Hexo%20+%20Github%20Personal%20Website%20Creation/</url>
+    <content><![CDATA[<hr>
+<blockquote>
 <p>Translated by ChatGPT</p>
 </blockquote>
-<p>A few days ago, during an interview, the interviewer suddenly asked me, “Why are you interested in pursuing a major related to data science?” I was momentarily at a loss for words. Saying it was purely out of love seemed somewhat insincere—it’s all about making a living, after all. There aren’t always grand narratives or beautiful visions.</p>
-<p>However, I answered the interviewer like this: I said that perhaps, without us knowing, some simple data analyses could bring us a lot of information. This information could be business-related, societal, or even personal. I have the habit of keeping a daily diary (although most of it is just rambling…), and just a few days ago, I ran a simple sentiment analysis on my daily diaries using an open-source model from Hugging Face. I told the interviewer that, maybe, data analysis could also help me understand myself better.</p>
-<p>So, I decided to start a “Simple” series, which is just about using libraries without needing deep technical knowledge.</p>
-<h2 id="0，My-Diary"><a href="#0，My-Diary" class="headerlink" title="0，My Diary"></a>0，My Diary</h2><p><img src="/en/../images/3/1_diary.jpg"></p>
-<p>This is my habit of keeping a diary, writing some words, and then not using any punctuation marks (this is quite perverse), using line breaks to separate sentences. In Python, the data looks something like this: <img src="/en/../images/3/1_diary2.jpg"></p>
-<p>What I actually need is the content in <code>diary_item_content</code>. After a series of operations to extract the content, I do some simple preprocessing in preparation for analysis. (No code here, as everyone has their own diary writing habits.)</p>
-<p><img src="/en/../images/3/1_diary3.jpg" alt="just replacing line breaks with periods lol"></p>
-<h2 id="1，-Direct-Use-of-Online-Models"><a href="#1，-Direct-Use-of-Online-Models" class="headerlink" title="1， Direct Use of Online Models"></a>1， Direct Use of Online Models</h2><h3 id="1-1-Hugging-Face"><a href="#1-1-Hugging-Face" class="headerlink" title="1.1 Hugging Face"></a>1.1 Hugging Face</h3><p>At <a href="https://huggingface.co/models">Hugging Face</a>, there are many deep models available for selection. These can be used for fine-tuning or directly out of the box. (Take it and use it!)</p>
-<p>I selected <a href="https://huggingface.co/touch20032003/xuyuan-trial-sentiment-bert-chinese">xuyuan-trial-sentiment-bert-chinese</a>, a sentiment analysis model fine-tuned on a Chinese dataset with BERT. Input text, and the output is roughly as follows:</p>
-<p><img src="/en/../images/3/2_modelExp.jpg" alt="Probabilities for different sentiments"></p>
-<p>At first glance, it seems pretty accurate.</p>
-<h3 id="1-2-Python-Usage"><a href="#1-2-Python-Usage" class="headerlink" title="1.2 Python Usage"></a>1.2 Python Usage</h3><p>Using it in Python is straightforward, just:</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> pipeline <span class="token comment"># Direct use of high-level API</span>
+<p>As the first post, let’s talk about how this website was made. I’ve wanted to create a personal website for a long time, but I gave up on the idea due to not knowing too much about it. Otherwise, I would have to start learning some strange JavaScript and CSS related stuff from scratch, which would be too torturous for me. However, while chatting yesterday, a friend mentioned, “Don’t you guys have something like a personal portfolio?” I realized I didn’t, but then I suddenly thought about personal websites again. Remembering that professors during my undergraduate days had their own websites, I searched for content related to “personal website creation” again. Surprisingly, there were ready-to-use libraries available, like Hexo, even equipped with various themes. Times have changed, and now everything has become so easy, everything can be generated with one click.</p>
+<p>Thank you, open-source hero.</p>
+<h2 id="First-Step-Configuring-Github"><a href="#First-Step-Configuring-Github" class="headerlink" title="First Step: Configuring Github"></a>First Step: Configuring Github</h2><p>The reason for using Github is simple; for individual users, it provides a free user page, which can perfectly serve as a personal webpage.</p>
+<h3 id="Registering-on-Github"><a href="#Registering-on-Github" class="headerlink" title="Registering on Github"></a>Registering on Github</h3><p>This step is omitted，many tutorial can be found online.</p>
+<h3 id="Generating-id-rsa-and-id-rsa-pub-locally"><a href="#Generating-id-rsa-and-id-rsa-pub-locally" class="headerlink" title="Generating id_rsa and id_rsa.pub locally"></a>Generating id_rsa and id_rsa.pub locally</h3><p>Open a CMD terminal (or Windows PowerShell is recommended), and enter the following commands in sequence</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;Github username&quot;
+git config --global user.email &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-pipe <span class="token operator">=</span> pipeline<span class="token punctuation">(</span><span class="token string">"text-classification"</span><span class="token punctuation">,</span> model<span class="token operator">=</span><span class="token string">"touch20032003/xuyuan-trial-sentiment-bert-chinese"</span><span class="token punctuation">)</span> <span class="token comment">#Model is selectable</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>使用例：</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">)</span>
-<span class="token comment"># output: [&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;]</span>
+<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#x7a;&#x63;&#112;&#105;&#x73;&#x6d;&#x65;&#64;&#x75;&#x63;&#x68;&#105;&#x63;&#97;&#103;&#x6f;&#x2e;&#101;&#100;&#117;">&#x7a;&#x63;&#112;&#105;&#x73;&#x6d;&#x65;&#64;&#x75;&#x63;&#x68;&#105;&#x63;&#97;&#103;&#x6f;&#x2e;&#101;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
+git config --global user.email &quot;zcpisme@uchicago.edu&quot;
+ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<span class="token comment">#or</span>
-pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token comment"># top_k = None returns all categories</span>
-<span class="token comment">#[&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;,</span>
-<span class="token comment"># &#123;'label': 'like', 'score': 0.18319253623485565&#125;,</span>
-<span class="token comment"># &#123;'label': 'disgust', 'score': 0.006669812370091677&#125;,</span>
-<span class="token comment"># &#123;'label': 'anger', 'score': 0.0025043778587132692&#125;,</span>
-<span class="token comment"># &#123;'label': 'fear', 'score': 0.0013982513919472694&#125;,</span>
-<span class="token comment"># &#123;'label': 'surprise', 'score': 0.0004570793535094708&#125;,</span>
-<span class="token comment"># &#123;'label': 'none', 'score': 0.0004206936282571405&#125;,</span>
-<span class="token comment"># &#123;'label': 'sadness', 'score': 0.0002451551263220608&#125;]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Press Enter, and if prompted with y&#x2F;n, type y and press Enter again</p>
+<p>The result is as shown in the image</p>
+<p><img src="/en/../images/1/1_rsakey.png"></p>
+<p>Open the generated id_rsa.pub with Notepad and copy its contents (located on my computer at C:\Users\12427.ssh)</p>
+<p><img src="/en/../images/1/1_rsakey2.png"></p>
+<h3 id="Linking-Github-Account"><a href="#Linking-Github-Account" class="headerlink" title="Linking Github Account"></a>Linking Github Account</h3><p><img src="/en/../images/1/1_gitrsa.png"></p>
+<p>Navigate to your GitHub account —&gt; Settings —&gt; SSH and GPG keys — new SSH key</p>
+<p><img src="/en/../images/1/1_gitrsa2.png"></p>
+<p><img src="/en/../images/1/1_gitrsa3.png"></p>
+<p>For the title, you can choose any name (your email is recommended), and paste the content from the id_rsa.pub you copied earlier into the key section.</p>
+<blockquote>
+<p>Can test connection by using ssh -T <a href="mailto:&#103;&#105;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#x62;&#46;&#x63;&#111;&#109;">&#103;&#105;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#x62;&#46;&#x63;&#111;&#109;</a></p>
+</blockquote>
+<p>With this, the connection to Github is complete.</p>
+<h3 id="Create-a-Repository-Named-username-github-io"><a href="#Create-a-Repository-Named-username-github-io" class="headerlink" title="Create a Repository Named username.github.io"></a>Create a Repository Named username.github.io</h3><p>At the top right corner, click on the plus sign and select New repository</p>
+<p><img src="/en/../images/1/1_gitio.png"></p>
+<p>For the repository name, enter “yourusername.github.io” <strong>!!! Important: It must be your username followed by .github.io, and each person can only have one such repository, which must be set to public</strong>, then click create repository at the bottom</p>
+<p><img src="/en/../images/1/1_gitio2.png"></p>
+<p>With this, the GitHub setup is complete.</p>
+<h2 id="Step-1-5-Having-Node-js"><a href="#Step-1-5-Having-Node-js" class="headerlink" title="Step 1.5: Having Node.js"></a>Step 1.5: Having Node.js</h2><p>Some might complain, “Ah, zcp, why are you being so verbose?” I say, hold on, my goal is to provide step-by-step instructions, and I also fear that I might forget how to start from scratch and organize tutorials from the web later, so being verbose is better. But for this part, it’s just to inform everyone that it exists and won’t be elaborated on here.</p>
+<p>Node.js is a JavaScript runtime environment, and our subsequent configurations will rely on it.</p>
+<p>For installation tutorials, refer to:</p>
+<p><a href="https://nodejs.org/en">https://nodejs.org/en</a></p>
+<p><a href="https://www.runoob.com/nodejs/nodejs-install-setup.html">https://www.runoob.com/nodejs/nodejs-install-setup.html</a></p>
+<p>Basically, just download and install the MSI image file.</p>
+<p>After installation, you can check if it was successful by entering in cmd:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">npm -v<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<h3 id="1-3-Simple-“For-Loop”"><a href="#1-3-Simple-“For-Loop”" class="headerlink" title="1.3 Simple “For Loop”"></a>1.3 Simple “For Loop”</h3><p>Not posting the code here, as it varies according to specific situations. Plus, it’s too crudely written to show off.</p>
-<p>I stored the results in a dictionary, with the key being the diary entry number, and the value being the sentiments of different paragraphs.</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
-<span class="token comment">#&#123;0: &#123;0: 'like', 1: 'anger'&#125;,</span>
-<span class="token comment"># 1: &#123;0: 'happiness', 1: 'like', 2: 'sadness', 3: 'disgust', 4: 'happiness'&#125;,</span>
-<span class="token comment"># 2: &#123;0: 'sadness', 1: 'sadness'&#125;,</span>
-<span class="token comment"># 3: &#123;0: 'disgust', 1: 'none', 2: 'sadness'&#125;,</span>
-<span class="token comment"># 4: &#123;0: 'disgust', 1: 'happiness'&#125;,</span>
-<span class="token comment"># 5: &#123;0: 'sadness'&#125;,</span>
-<span class="token comment"># 6: &#123;1: 'disgust'&#125;,</span>
-<span class="token comment"># .....</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/en/../images/1/1_nodejs.png"></p>
+<h2 id="Step-2-Your-First-Hexo-Personal-Webpage"><a href="#Step-2-Your-First-Hexo-Personal-Webpage" class="headerlink" title="Step 2: Your First Hexo Personal Webpage"></a>Step 2: Your First Hexo Personal Webpage</h2><p>Here we go! With the above configurations, everything that follows becomes foolproof. You neither have to hand-code the webpage yourself nor need any programming knowledge.</p>
+<p>After the previous step, we can use <strong>npm</strong> to manage packages in node.js.</p>
+<h3 id="Installing-Hexo"><a href="#Installing-Hexo" class="headerlink" title="Installing Hexo"></a>Installing Hexo</h3><p>Enter the following command:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">npm install hexo-cli -g<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>You could save it locally as a pickle:</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> pickle
-<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'DiarySentimentRes'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
-  pickle<span class="token punctuation">.</span>dump<span class="token punctuation">(</span>res<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="Initializing-Hexo"><a href="#Initializing-Hexo" class="headerlink" title="Initializing Hexo"></a>Initializing Hexo</h3><p>For example, if I want to create a folder called myFirstBlog in D:\desktop\campus\personalBlog to manage my webpage, enter this folder in cmd:</p>
+<p><img src="/en/../images/1/1_enterfolder.png"></p>
+<p>Enter:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo init myFirstBlog<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<h2 id="2-My-Sentiments"><a href="#2-My-Sentiments" class="headerlink" title="2,  My Sentiments"></a>2,  My Sentiments</h2><p>Next, I tallied the count of each emotion.</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">sentiCount <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">'sadness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'happiness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'like'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'anger'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'surprise'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'disgust'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'fear'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'none'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">&#125;</span>
+<p>As you can see, myFirstBlog has been created.</p>
+<p><img src="/en/../images/1/1_enterfolder2.png"></p>
+<h3 id="Launching-Your-Personal-Website"><a href="#Launching-Your-Personal-Website" class="headerlink" title="Launching Your Personal Website"></a>Launching Your Personal Website</h3><p>Start the server in the folder you just created:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo s<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token keyword">for</span> i<span class="token punctuation">,</span>j <span class="token keyword">in</span> res<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-  <span class="token keyword">for</span> m<span class="token punctuation">,</span>n <span class="token keyword">in</span> j<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token builtin">type</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token builtin">list</span><span class="token punctuation">:</span>
-      <span class="token keyword">for</span> k <span class="token keyword">in</span> n<span class="token punctuation">:</span>
-        sentiCount<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
-    <span class="token keyword">else</span><span class="token punctuation">:</span>
-      sentiCount<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
-    
-<span class="token keyword">print</span><span class="token punctuation">(</span>sentiCount<span class="token punctuation">)</span>
-<span class="token triple-quoted-string string">'''
-&#123;'sadness': 1227,
- 'happiness': 1075,
- 'like': 784,
- 'anger': 550,
- 'surprise': 129,
- 'disgust': 918,
- 'fear': 106,
- 'none': 558&#125;
-'''</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/en/../images/1/1_starthexo.png"></p>
+<p>You can also specify a port with hexo -s -p 4001 for debugging multiple sites (the default port is 4000).</p>
+<p>Copy <a href="http://localhost:4000/">http://localhost:4000/</a> into your browser, and you can (locally) preview your site.</p>
+<p><strong>Congratulations! You now have your own website!</strong><img src="/en/../images/1/1_starthexo2.png"></p>
+<h2 id="Step-3-Hold-on-a-Moment-Publishing-to-Github"><a href="#Step-3-Hold-on-a-Moment-Publishing-to-Github" class="headerlink" title="Step 3: Hold on a Moment (Publishing to Github)"></a>Step 3: Hold on a Moment (Publishing to Github)</h2><p>Of course, we can’t limit ourselves to local previews. We need to publish our webpage to the public internet so that everyone can view it. To do this, follow the configuration steps below.</p>
+<h3 id="Configuring-the-config-yml-File"><a href="#Configuring-the-config-yml-File" class="headerlink" title="Configuring the _config.yml File"></a>Configuring the _config.yml File</h3><p>In the myFirstBlog folder created earlier, there is a file named _config.yml. Open this file with Notepad. Scroll to the very bottom to the #Deployment section, set type to git, repo to the URL of your initial repository followed by .git, and branch to master. For example:</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd"># Deployment
+## Docs: https:&#x2F;&#x2F;hexo.io&#x2F;docs&#x2F;one-command-deployment
+deploy:
+  type: git
+  repo: https:&#x2F;&#x2F;github.com&#x2F;zcpisme&#x2F;zcpisme.github.io.git
+  branch: master<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>(It turns out happiness and sadness are almost equally distributed, probably because I only remember to write my diary late at night, hence the deep-night emo moments 😟)</p>
-<p>I simply plotted a pie chart,</p>
-<p><img src="/en/../images/3/3_sentpie.jpg" alt="happy to see I&#39;m emotional"></p>
-<h2 id="3，-Some-Basic-Concepts"><a href="#3，-Some-Basic-Concepts" class="headerlink" title="3， Some Basic Concepts"></a>3， Some Basic Concepts</h2><p>In today’s AI-booming era, operations have gradually become simplified, allowing for direct model usage without the need for extensive explanations. Most people can quickly get involved and learn about their interests in AI. AI drawing even has open-source graphical interfaces, eliminating the need for even basic programming languages like Python. Thus, everything seems simple (at least if you don’t delve too deep, perhaps).</p>
-<p>Back to sentiment analysis, one could actually train a classifier themselves (SVM, Logistic Regression, etc.), and the results might not necessarily be worse than those of so-called deep learning models. Frankly, if there’s an appropriate dataset, hard training might yield even better results.</p>
-<h2 id="4，-一些小概念"><a href="#4，-一些小概念" class="headerlink" title="4， 一些小概念"></a>4， 一些小概念</h2><p>Indeed, I prefer to discuss conceptual stuff later on, as starting with all sorts of technical jargon can be headache-inducing.</p>
-<ul>
-<li>Transformer: An encoder-decoder architecture that shone brightly after being mentioned in <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a>.</li>
-<li>Encoder: The Encoder understands the content of an article and passes the information to the Decoder.</li>
-<li>Decoder: Generates corresponding tasks using the results given by the Encoder.</li>
-<li>BERT (Bidirectional Encoder Representations from Transformers): The encoder part of a transformer, usually used for article classification, named entity recognition, and other tasks.</li>
-<li>GPT (Generative Pretrained Transformer): In contrast to BERT, it uses only the decoder part, typically for generative tasks.</li>
-</ul>
+<h3 id="Publishing"><a href="#Publishing" class="headerlink" title="Publishing"></a>Publishing</h3><p>The last step, in the cmd (still inside the myFirstBlog folder), enter</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo clean
+hexo g
+hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>Wait for the files to upload to GitHub. After a few minutes, username.github.io will be your personal webpage!</p>
+<p><img src="/en/../images/1/1_gitiofinal.png"></p>
+<p>Isn’t it as easy as ABC~</p>
+<h3 id="Common-Hexo-Commands"><a href="#Common-Hexo-Commands" class="headerlink" title="Common Hexo Commands"></a>Common Hexo Commands</h3><pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">hexo init [folder] # Initialize hexo
+hexo new [layout] &lt;title&gt; # Create a new post, all posts need to be in markdown (.md) format, by default located in .&#x2F;source&#x2F;_post folder
+hexo generate # Generate static files, same as hexo g
+hexo server # Start local server, same as hexo s
+hexo deploy # Deploy website, same as hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h3><p>In personal use, changing and deploying repeatedly, entering commands one by one can be cumbersome (and you might even miss a step). So, you can create a sh script, and run it each time.</p>
+<p>For example, inside the myFirstBlog folder, create a new Notepad document, enter</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span>
+
+<span class="token comment"># Stop script on any error</span>
+<span class="token builtin class-name">set</span> <span class="token parameter variable">-e</span>
+
+<span class="token comment"># Navigate to the Hexo project directory (if not already there)</span>
+
+<span class="token comment"># Clean the public directory</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Cleaning..."</span>
+hexo clean
+
+<span class="token comment"># Generate static files</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Generating..."</span>
+hexo generate
+
+<span class="token comment"># Deploy to the server</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"Deploying..."</span>
+hexo deploy
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Deployment successful!"</span>
+
+<span class="token builtin class-name">echo</span> <span class="token string">"Press enter to close"</span>
+<span class="token builtin class-name">read</span> <span class="token parameter variable">-r</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Rename the file to deploy.sh, before deploying enter</p>
+<pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">.&#x2F;deploy.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h2 id="Step-Wait-a-Bit-Longer-Optional"><a href="#Step-Wait-a-Bit-Longer-Optional" class="headerlink" title="Step ?: Wait a Bit Longer (Optional)"></a>Step ?: Wait a Bit Longer (Optional)</h2><p>Perhaps some friends are very excited to open the webpage and admire it. Then, they find the webpage design so monotonous, secretly cursing: “This is cheating, cheap goods are not good.” I sneezed twice in front of the screen and said, hold on, again.</p>
+<p>Of course, that’s not the case. The real fun part is coming. There are so many people in the world who contribute out of passion, leading to a wide variety of themes available for Hexo to choose from.</p>
+<p>Here at <a href="https://hexo.io/themes/index.html">Hexo Themes</a> you can pick a theme to your liking, from simple styles to elaborate designs. Currently, <a href="https://theme-next.js.org/docs/">NexT</a> is popular for its simplicity and extensive customization plugins. Here, we’ll choose <a href="https://github.com/blinkfox/hexo-theme-matery?tab=readme-ov-file">hexo-theme-matery</a>, a very beautiful theme. Again, thanks to the open-source heroes, and thank you <a href="https://github.com/blinkfox">Blinkfox</a>.</p>
+<p>After choosing a theme, download the source files (git clone) and copy the downloaded files to the <strong>themes</strong> folder under myFirstBlog.</p>
+<p>Similarly, in the _config.yml configuration file, change the theme to the name of the folder you just downloaded, for example,</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># Extensions</span>
+<span class="token comment">## Plugins: https://hexo.io/plugins/</span>
+<span class="token comment">## Themes: https://hexo.io/themes/</span>
+<span class="token key atrule">theme</span><span class="token punctuation">:</span> hexo<span class="token punctuation">-</span>theme<span class="token punctuation">-</span>matery<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Publish again, and you can see the webpage theme has become fancier. Usually, each theme has its own detailed documentation.</p>
+<h2 id="Conclusion-of-This-Article"><a href="#Conclusion-of-This-Article" class="headerlink" title="Conclusion of This Article"></a>Conclusion of This Article</h2><p>Exploring an unknown thing is joyful, and there is immense pleasure in the heart when succeeding after repeated trials and errors.</p>
+<p>Thank you for reading my first article, please be forgiving, and suggestions are welcome!</p>
+<p>In the next article, we will talk about some additional settings I have for the matery theme.</p>
 ]]></content>
       <categories>
-        <category>Natural Language Processing (NLP)</category>
+        <category>Personal Website</category>
       </categories>
       <tags>
-        <tag>Natural Language Processing</tag>
-        <tag>Deep Learning</tag>
-        <tag>Sentiment Analysis</tag>
+        <tag>Hexo</tag>
+        <tag>Github</tag>
       </tags>
   </entry>
   <entry>
@@ -1072,6 +975,106 @@ pipe<span class="token punctuation">(</span><span class="token string">'Today I 
         <tag>Mathematics</tag>
         <tag>Machine Learning</tag>
         <tag>Linear &amp; Nonlinear Analysis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Simple NLP — Sentiment Analysis</title>
+    <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by ChatGPT</p>
+</blockquote>
+<p>A few days ago, during an interview, the interviewer suddenly asked me, “Why are you interested in pursuing a major related to data science?” I was momentarily at a loss for words. Saying it was purely out of love seemed somewhat insincere—it’s all about making a living, after all. There aren’t always grand narratives or beautiful visions.</p>
+<p>However, I answered the interviewer like this: I said that perhaps, without us knowing, some simple data analyses could bring us a lot of information. This information could be business-related, societal, or even personal. I have the habit of keeping a daily diary (although most of it is just rambling…), and just a few days ago, I ran a simple sentiment analysis on my daily diaries using an open-source model from Hugging Face. I told the interviewer that, maybe, data analysis could also help me understand myself better.</p>
+<p>So, I decided to start a “Simple” series, which is just about using libraries without needing deep technical knowledge.</p>
+<h2 id="0，My-Diary"><a href="#0，My-Diary" class="headerlink" title="0，My Diary"></a>0，My Diary</h2><p><img src="/en/../images/3/1_diary.jpg"></p>
+<p>This is my habit of keeping a diary, writing some words, and then not using any punctuation marks (this is quite perverse), using line breaks to separate sentences. In Python, the data looks something like this: <img src="/en/../images/3/1_diary2.jpg"></p>
+<p>What I actually need is the content in <code>diary_item_content</code>. After a series of operations to extract the content, I do some simple preprocessing in preparation for analysis. (No code here, as everyone has their own diary writing habits.)</p>
+<p><img src="/en/../images/3/1_diary3.jpg" alt="just replacing line breaks with periods lol"></p>
+<h2 id="1，-Direct-Use-of-Online-Models"><a href="#1，-Direct-Use-of-Online-Models" class="headerlink" title="1， Direct Use of Online Models"></a>1， Direct Use of Online Models</h2><h3 id="1-1-Hugging-Face"><a href="#1-1-Hugging-Face" class="headerlink" title="1.1 Hugging Face"></a>1.1 Hugging Face</h3><p>At <a href="https://huggingface.co/models">Hugging Face</a>, there are many deep models available for selection. These can be used for fine-tuning or directly out of the box. (Take it and use it!)</p>
+<p>I selected <a href="https://huggingface.co/touch20032003/xuyuan-trial-sentiment-bert-chinese">xuyuan-trial-sentiment-bert-chinese</a>, a sentiment analysis model fine-tuned on a Chinese dataset with BERT. Input text, and the output is roughly as follows:</p>
+<p><img src="/en/../images/3/2_modelExp.jpg" alt="Probabilities for different sentiments"></p>
+<p>At first glance, it seems pretty accurate.</p>
+<h3 id="1-2-Python-Usage"><a href="#1-2-Python-Usage" class="headerlink" title="1.2 Python Usage"></a>1.2 Python Usage</h3><p>Using it in Python is straightforward, just:</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> transformers <span class="token keyword">import</span> pipeline <span class="token comment"># Direct use of high-level API</span>
+
+pipe <span class="token operator">=</span> pipeline<span class="token punctuation">(</span><span class="token string">"text-classification"</span><span class="token punctuation">,</span> model<span class="token operator">=</span><span class="token string">"touch20032003/xuyuan-trial-sentiment-bert-chinese"</span><span class="token punctuation">)</span> <span class="token comment">#Model is selectable</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>使用例：</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">)</span>
+<span class="token comment"># output: [&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;]</span>
+
+<span class="token comment">#or</span>
+pipe<span class="token punctuation">(</span><span class="token string">'Today I came to Tampa. It is sunshine and beaches. Fine sand and a calm, leisurely life. Not many people around. Seagulls flying around people. If possible, I would like to live here longer.'</span><span class="token punctuation">,</span> top_k<span class="token operator">=</span><span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token comment"># top_k = None returns all categories</span>
+<span class="token comment">#[&#123;'label': 'happiness', 'score': 0.8051121234893799&#125;,</span>
+<span class="token comment"># &#123;'label': 'like', 'score': 0.18319253623485565&#125;,</span>
+<span class="token comment"># &#123;'label': 'disgust', 'score': 0.006669812370091677&#125;,</span>
+<span class="token comment"># &#123;'label': 'anger', 'score': 0.0025043778587132692&#125;,</span>
+<span class="token comment"># &#123;'label': 'fear', 'score': 0.0013982513919472694&#125;,</span>
+<span class="token comment"># &#123;'label': 'surprise', 'score': 0.0004570793535094708&#125;,</span>
+<span class="token comment"># &#123;'label': 'none', 'score': 0.0004206936282571405&#125;,</span>
+<span class="token comment"># &#123;'label': 'sadness', 'score': 0.0002451551263220608&#125;]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="1-3-Simple-“For-Loop”"><a href="#1-3-Simple-“For-Loop”" class="headerlink" title="1.3 Simple “For Loop”"></a>1.3 Simple “For Loop”</h3><p>Not posting the code here, as it varies according to specific situations. Plus, it’s too crudely written to show off.</p>
+<p>I stored the results in a dictionary, with the key being the diary entry number, and the value being the sentiments of different paragraphs.</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">print</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+<span class="token comment">#&#123;0: &#123;0: 'like', 1: 'anger'&#125;,</span>
+<span class="token comment"># 1: &#123;0: 'happiness', 1: 'like', 2: 'sadness', 3: 'disgust', 4: 'happiness'&#125;,</span>
+<span class="token comment"># 2: &#123;0: 'sadness', 1: 'sadness'&#125;,</span>
+<span class="token comment"># 3: &#123;0: 'disgust', 1: 'none', 2: 'sadness'&#125;,</span>
+<span class="token comment"># 4: &#123;0: 'disgust', 1: 'happiness'&#125;,</span>
+<span class="token comment"># 5: &#123;0: 'sadness'&#125;,</span>
+<span class="token comment"># 6: &#123;1: 'disgust'&#125;,</span>
+<span class="token comment"># .....</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>You could save it locally as a pickle:</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> pickle
+<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">'DiarySentimentRes'</span><span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+  pickle<span class="token punctuation">.</span>dump<span class="token punctuation">(</span>res<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="2-My-Sentiments"><a href="#2-My-Sentiments" class="headerlink" title="2,  My Sentiments"></a>2,  My Sentiments</h2><p>Next, I tallied the count of each emotion.</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">sentiCount <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token string">'sadness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'happiness'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'like'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'anger'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'surprise'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'disgust'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'fear'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">'none'</span><span class="token punctuation">:</span><span class="token number">0</span><span class="token punctuation">&#125;</span>
+
+<span class="token keyword">for</span> i<span class="token punctuation">,</span>j <span class="token keyword">in</span> res<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token keyword">for</span> m<span class="token punctuation">,</span>n <span class="token keyword">in</span> j<span class="token punctuation">.</span>items<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token builtin">type</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token builtin">list</span><span class="token punctuation">:</span>
+      <span class="token keyword">for</span> k <span class="token keyword">in</span> n<span class="token punctuation">:</span>
+        sentiCount<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
+    <span class="token keyword">else</span><span class="token punctuation">:</span>
+      sentiCount<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token operator">+=</span><span class="token number">1</span>
+    
+<span class="token keyword">print</span><span class="token punctuation">(</span>sentiCount<span class="token punctuation">)</span>
+<span class="token triple-quoted-string string">'''
+&#123;'sadness': 1227,
+ 'happiness': 1075,
+ 'like': 784,
+ 'anger': 550,
+ 'surprise': 129,
+ 'disgust': 918,
+ 'fear': 106,
+ 'none': 558&#125;
+'''</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>(It turns out happiness and sadness are almost equally distributed, probably because I only remember to write my diary late at night, hence the deep-night emo moments 😟)</p>
+<p>I simply plotted a pie chart,</p>
+<p><img src="/en/../images/3/3_sentpie.jpg" alt="happy to see I&#39;m emotional"></p>
+<h2 id="3，-Some-Basic-Concepts"><a href="#3，-Some-Basic-Concepts" class="headerlink" title="3， Some Basic Concepts"></a>3， Some Basic Concepts</h2><p>In today’s AI-booming era, operations have gradually become simplified, allowing for direct model usage without the need for extensive explanations. Most people can quickly get involved and learn about their interests in AI. AI drawing even has open-source graphical interfaces, eliminating the need for even basic programming languages like Python. Thus, everything seems simple (at least if you don’t delve too deep, perhaps).</p>
+<p>Back to sentiment analysis, one could actually train a classifier themselves (SVM, Logistic Regression, etc.), and the results might not necessarily be worse than those of so-called deep learning models. Frankly, if there’s an appropriate dataset, hard training might yield even better results.</p>
+<h2 id="4，-一些小概念"><a href="#4，-一些小概念" class="headerlink" title="4， 一些小概念"></a>4， 一些小概念</h2><p>Indeed, I prefer to discuss conceptual stuff later on, as starting with all sorts of technical jargon can be headache-inducing.</p>
+<ul>
+<li>Transformer: An encoder-decoder architecture that shone brightly after being mentioned in <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a>.</li>
+<li>Encoder: The Encoder understands the content of an article and passes the information to the Decoder.</li>
+<li>Decoder: Generates corresponding tasks using the results given by the Encoder.</li>
+<li>BERT (Bidirectional Encoder Representations from Transformers): The encoder part of a transformer, usually used for article classification, named entity recognition, and other tasks.</li>
+<li>GPT (Generative Pretrained Transformer): In contrast to BERT, it uses only the decoder part, typically for generative tasks.</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Natural Language Processing (NLP)</category>
+      </categories>
+      <tags>
+        <tag>Natural Language Processing</tag>
+        <tag>Deep Learning</tag>
+        <tag>Sentiment Analysis</tag>
       </tags>
   </entry>
   <entry>
