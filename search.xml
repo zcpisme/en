@@ -105,58 +105,121 @@
       </tags>
   </entry>
   <entry>
-    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
-    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
-    <content><![CDATA[<blockquote>
-<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
-</blockquote>
-<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
-<p>Tools used:</p>
+    <title>Commonly Used Commands</title>
+    <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
+    <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
+<h1 id="Common-Linux-Commands"><a href="#Common-Linux-Commands" class="headerlink" title="Common Linux Commands"></a><strong>Common Linux Commands</strong></h1><h2 id="System-Information"><a href="#System-Information" class="headerlink" title="System Information"></a><strong>System Information</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">uname</span> <span class="token parameter variable">-a</span>               <span class="token comment"># Display system information</span>
+<span class="token function">hostname</span>               <span class="token comment"># Show or set the hostname</span>
+<span class="token function">whoami</span>                 <span class="token comment"># Current logged-in user</span>
+<span class="token function">uptime</span>                 <span class="token comment"># System uptime and load</span>
+<span class="token function">date</span>                   <span class="token comment"># Current date and time</span>
+<span class="token function">cal</span>                    <span class="token comment"># Display a calendar</span>
+<span class="token function">df</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># View disk usage</span>
+<span class="token function">du</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># Check directory or file size</span>
+<span class="token function">free</span> <span class="token parameter variable">-m</span>                <span class="token comment"># View memory usage</span>
+<span class="token function">top</span>                    <span class="token comment"># Display dynamic process info</span>
+<span class="token function">htop</span>                   <span class="token comment"># Similar to top, requires installation</span>
+<span class="token function">ps</span> <span class="token parameter variable">-aux</span>                <span class="token comment"># List all running processes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="File-and-Directory-Operations"><a href="#File-and-Directory-Operations" class="headerlink" title="File and Directory Operations"></a><strong>File and Directory Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">ls</span>                     <span class="token comment"># List directory contents</span>
+<span class="token function">ls</span> <span class="token parameter variable">-l</span>                  <span class="token comment"># Show detailed information</span>
+<span class="token function">ls</span> <span class="token parameter variable">-a</span>                  <span class="token comment"># Display hidden files</span>
+<span class="token builtin class-name">cd</span> /path/to/dir        <span class="token comment"># Change directory</span>
+<span class="token builtin class-name">pwd</span>                    <span class="token comment"># Show the current path</span>
+<span class="token function">mkdir</span> new_dir          <span class="token comment"># Create a directory</span>
+<span class="token function">rmdir</span> empty_dir        <span class="token comment"># Remove an empty directory</span>
+<span class="token function">rm</span> <span class="token function">file</span>                <span class="token comment"># Delete a file</span>
+<span class="token function">rm</span> <span class="token parameter variable">-r</span> <span class="token function">dir</span>              <span class="token comment"># Delete a directory and its contents</span>
+<span class="token function">cp</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Copy files or directories</span>
+<span class="token function">mv</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Move or rename files</span>
+<span class="token function">find</span> /path <span class="token parameter variable">-name</span> <span class="token string">"*.txt"</span> <span class="token comment"># Search for files</span>
+<span class="token function">locate</span> filename        <span class="token comment"># Quickly find files</span>
+tree                   <span class="token comment"># Show directory structure as a tree (requires installation)</span>
+<span class="token function">touch</span> file.txt         <span class="token comment"># Create an empty file</span>
+<span class="token function">stat</span> file.txt          <span class="token comment"># View detailed file information</span>
+<span class="token function">file</span> file.txt          <span class="token comment"># Determine file type</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Viewing-File-Contents"><a href="#Viewing-File-Contents" class="headerlink" title="Viewing File Contents"></a><strong>Viewing File Contents</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> file.txt           <span class="token comment"># Display file content</span>
+<span class="token function">tac</span> file.txt           <span class="token comment"># Display file content in reverse order</span>
+<span class="token function">less</span> file.txt          <span class="token comment"># View file content in pages</span>
+<span class="token function">more</span> file.txt          <span class="token comment"># Similar to less</span>
+<span class="token function">head</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the first 10 lines of a file</span>
+<span class="token function">tail</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the last 10 lines of a file</span>
+<span class="token function">tail</span> <span class="token parameter variable">-f</span> log.txt        <span class="token comment"># Follow a log file in real-time</span>
+<span class="token function">nl</span> file.txt            <span class="token comment"># Display file content with line numbers</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Permission-Management"><a href="#Permission-Management" class="headerlink" title="Permission Management"></a><strong>Permission Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">755</span> file.txt     <span class="token comment"># Change permissions</span>
+<span class="token function">chown</span> user file.txt    <span class="token comment"># Change file owner</span>
+<span class="token function">chgrp</span> group file.txt   <span class="token comment"># Change file group</span>
+<span class="token builtin class-name">umask</span> 022              <span class="token comment"># Set default file permissions</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Numeric Permission Representation:</strong> Permissions are represented by three numbers (0–7) for:</p>
+<ol>
+<li><strong>Owner (User)</strong></li>
+<li><strong>Group</strong></li>
+<li><strong>Others</strong></li>
+</ol>
+<p>Each number is a sum of:</p>
 <ul>
-<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
-<li><strong>Git</strong></li>
-<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
+<li>4: Read (r)</li>
+<li>2: Write (w)</li>
+<li>1: Execute (x)</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li><code>7 = 4 + 2 + 1</code> (read, write, execute)</li>
+<li><code>5 = 4 + 1</code> (read, execute)</li>
+<li><code>6 = 4 + 2</code> (read, write)</li>
+</ul>
+<p>For <strong>755</strong>:</p>
+<ul>
+<li><strong>Owner:</strong> Read, write, execute (<code>rwx</code>)</li>
+<li><strong>Group&#x2F;Others:</strong> Read, execute (<code>r-x</code>)</li>
 </ul>
 <hr>
-<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
-<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
-<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
-<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
-<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
-</li>
-<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
-</li>
-</ol>
-<hr>
-<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
-<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
-<p>To configure swap space:</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
-<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
-<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
-<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
-<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
-/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
-<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="Common-Git-Commands"><a href="#Common-Git-Commands" class="headerlink" title="Common Git Commands"></a><strong>Common Git Commands</strong></h1><h2 id="Git-Configuration"><a href="#Git-Configuration" class="headerlink" title="Git Configuration"></a><strong>Git Configuration</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> config <span class="token parameter variable">--global</span> user.name <span class="token string">"Your Name"</span>               <span class="token comment"># Set global username</span>
+<span class="token function">git</span> config <span class="token parameter variable">--global</span> user.email <span class="token string">"your.email@example.com"</span> <span class="token comment"># Set global email</span>
+<span class="token function">git</span> config <span class="token parameter variable">--list</span>                                       <span class="token comment"># View current configuration</span>
+<span class="token function">git</span> config <span class="token parameter variable">--global</span> core.editor <span class="token function">vim</span>                    <span class="token comment"># Set default editor</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
-<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
-<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
-CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h2 id="Repository-Operations"><a href="#Repository-Operations" class="headerlink" title="Repository Operations"></a><strong>Repository Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> init                          <span class="token comment"># Initialize a new Git repository</span>
+<span class="token function">git</span> clone <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>              <span class="token comment"># Clone a remote repository locally</span>
+<span class="token function">git</span> status                        <span class="token comment"># View the current branch status</span>
+<span class="token function">git</span> log                           <span class="token comment"># View commit history</span>
+<span class="token function">git</span> log <span class="token parameter variable">--oneline</span>                 <span class="token comment"># Simplified commit history</span>
+<span class="token function">git</span> show <span class="token operator">&lt;</span>commit_hash<span class="token operator">></span>            <span class="token comment"># View details of a specific commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
+<h2 id="Branch-Management"><a href="#Branch-Management" class="headerlink" title="Branch Management"></a><strong>Branch Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch                        <span class="token comment"># List local branches</span>
+<span class="token function">git</span> branch <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>          <span class="token comment"># Create a new branch</span>
+<span class="token function">git</span> checkout <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>        <span class="token comment"># Switch to a specific branch</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">-b</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Create and switch to a new branch</span>
+<span class="token function">git</span> merge <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>           <span class="token comment"># Merge a branch into the current branch</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-d</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Delete a local branch</span>
+<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Force delete a local branch</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Making-Changes"><a href="#Making-Changes" class="headerlink" title="Making Changes"></a><strong>Making Changes</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> <span class="token function">add</span> <span class="token operator">&lt;</span>file<span class="token operator">></span>                    <span class="token comment"># Add a file to the staging area</span>
+<span class="token function">git</span> <span class="token function">add</span> <span class="token builtin class-name">.</span>                         <span class="token comment"># Add all files in the current directory</span>
+<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"commit message"</span>    <span class="token comment"># Commit changes with a message</span>
+<span class="token function">git</span> commit <span class="token parameter variable">--amend</span>                <span class="token comment"># Modify the previous commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="Remote-Repository-Operations"><a href="#Remote-Repository-Operations" class="headerlink" title="Remote Repository Operations"></a><strong>Remote Repository Operations</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote <span class="token parameter variable">-v</span>                     <span class="token comment"># View remote repository URLs</span>
+<span class="token function">git</span> remote <span class="token function">add</span> origin <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>  <span class="token comment"># Add a remote repository</span>
+<span class="token function">git</span> push origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Push a branch to the remote repository</span>
+<span class="token function">git</span> pull origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Pull updates from the remote repository</span>
+<span class="token function">git</span> fetch origin                  <span class="token comment"># Fetch updates without merging</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Stashing"><a href="#Stashing" class="headerlink" title="Stashing"></a><strong>Stashing</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> stash                         <span class="token comment"># Save current progress</span>
+<span class="token function">git</span> stash list                    <span class="token comment"># View saved stashes</span>
+<span class="token function">git</span> stash apply                   <span class="token comment"># Restore the most recent stash</span>
+<span class="token function">git</span> stash <span class="token function">clear</span>                   <span class="token comment"># Clear all stashes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 ]]></content>
       <categories>
-        <category>Dify</category>
+        <category>Programming Basics</category>
       </categories>
       <tags>
-        <tag>Dify</tag>
-        <tag>Anime</tag>
-        <tag>Rem!</tag>
+        <tag>Linux</tag>
+        <tag>Git</tag>
+        <tag>common commands</tag>
       </tags>
   </entry>
   <entry>
@@ -375,121 +438,58 @@ CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="t
       </tags>
   </entry>
   <entry>
-    <title>Commonly Used Commands</title>
-    <url>/en/2025/01/12/14_2025-01-12-Useful%20Command/</url>
-    <content><![CDATA[<p>When I first started studying computers, I was resistant to using Linux and Git, but once I got used to them, I found them extremely useful. This document is a record of frequently used commands so I don’t have to look them up or ask GPT each time.</p>
-<h1 id="Common-Linux-Commands"><a href="#Common-Linux-Commands" class="headerlink" title="Common Linux Commands"></a><strong>Common Linux Commands</strong></h1><h2 id="System-Information"><a href="#System-Information" class="headerlink" title="System Information"></a><strong>System Information</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">uname</span> <span class="token parameter variable">-a</span>               <span class="token comment"># Display system information</span>
-<span class="token function">hostname</span>               <span class="token comment"># Show or set the hostname</span>
-<span class="token function">whoami</span>                 <span class="token comment"># Current logged-in user</span>
-<span class="token function">uptime</span>                 <span class="token comment"># System uptime and load</span>
-<span class="token function">date</span>                   <span class="token comment"># Current date and time</span>
-<span class="token function">cal</span>                    <span class="token comment"># Display a calendar</span>
-<span class="token function">df</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># View disk usage</span>
-<span class="token function">du</span> <span class="token parameter variable">-h</span>                  <span class="token comment"># Check directory or file size</span>
-<span class="token function">free</span> <span class="token parameter variable">-m</span>                <span class="token comment"># View memory usage</span>
-<span class="token function">top</span>                    <span class="token comment"># Display dynamic process info</span>
-<span class="token function">htop</span>                   <span class="token comment"># Similar to top, requires installation</span>
-<span class="token function">ps</span> <span class="token parameter variable">-aux</span>                <span class="token comment"># List all running processes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="File-and-Directory-Operations"><a href="#File-and-Directory-Operations" class="headerlink" title="File and Directory Operations"></a><strong>File and Directory Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">ls</span>                     <span class="token comment"># List directory contents</span>
-<span class="token function">ls</span> <span class="token parameter variable">-l</span>                  <span class="token comment"># Show detailed information</span>
-<span class="token function">ls</span> <span class="token parameter variable">-a</span>                  <span class="token comment"># Display hidden files</span>
-<span class="token builtin class-name">cd</span> /path/to/dir        <span class="token comment"># Change directory</span>
-<span class="token builtin class-name">pwd</span>                    <span class="token comment"># Show the current path</span>
-<span class="token function">mkdir</span> new_dir          <span class="token comment"># Create a directory</span>
-<span class="token function">rmdir</span> empty_dir        <span class="token comment"># Remove an empty directory</span>
-<span class="token function">rm</span> <span class="token function">file</span>                <span class="token comment"># Delete a file</span>
-<span class="token function">rm</span> <span class="token parameter variable">-r</span> <span class="token function">dir</span>              <span class="token comment"># Delete a directory and its contents</span>
-<span class="token function">cp</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Copy files or directories</span>
-<span class="token function">mv</span> <span class="token builtin class-name">source</span> dest         <span class="token comment"># Move or rename files</span>
-<span class="token function">find</span> /path <span class="token parameter variable">-name</span> <span class="token string">"*.txt"</span> <span class="token comment"># Search for files</span>
-<span class="token function">locate</span> filename        <span class="token comment"># Quickly find files</span>
-tree                   <span class="token comment"># Show directory structure as a tree (requires installation)</span>
-<span class="token function">touch</span> file.txt         <span class="token comment"># Create an empty file</span>
-<span class="token function">stat</span> file.txt          <span class="token comment"># View detailed file information</span>
-<span class="token function">file</span> file.txt          <span class="token comment"># Determine file type</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Viewing-File-Contents"><a href="#Viewing-File-Contents" class="headerlink" title="Viewing File Contents"></a><strong>Viewing File Contents</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> file.txt           <span class="token comment"># Display file content</span>
-<span class="token function">tac</span> file.txt           <span class="token comment"># Display file content in reverse order</span>
-<span class="token function">less</span> file.txt          <span class="token comment"># View file content in pages</span>
-<span class="token function">more</span> file.txt          <span class="token comment"># Similar to less</span>
-<span class="token function">head</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the first 10 lines of a file</span>
-<span class="token function">tail</span> <span class="token parameter variable">-n</span> <span class="token number">10</span> file.txt    <span class="token comment"># View the last 10 lines of a file</span>
-<span class="token function">tail</span> <span class="token parameter variable">-f</span> log.txt        <span class="token comment"># Follow a log file in real-time</span>
-<span class="token function">nl</span> file.txt            <span class="token comment"># Display file content with line numbers</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Permission-Management"><a href="#Permission-Management" class="headerlink" title="Permission Management"></a><strong>Permission Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">chmod</span> <span class="token number">755</span> file.txt     <span class="token comment"># Change permissions</span>
-<span class="token function">chown</span> user file.txt    <span class="token comment"># Change file owner</span>
-<span class="token function">chgrp</span> group file.txt   <span class="token comment"># Change file group</span>
-<span class="token builtin class-name">umask</span> 022              <span class="token comment"># Set default file permissions</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>Numeric Permission Representation:</strong> Permissions are represented by three numbers (0–7) for:</p>
-<ol>
-<li><strong>Owner (User)</strong></li>
-<li><strong>Group</strong></li>
-<li><strong>Others</strong></li>
-</ol>
-<p>Each number is a sum of:</p>
+    <title>AWS EC2 Free Tier and Dify 0.12.1 Experience</title>
+    <url>/en/2024/11/27/13_2024-11-26-AWS%20and%20Dify/</url>
+    <content><![CDATA[<blockquote>
+<p>Translated by GPT4o from my <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">original chinese page</a>.</p>
+</blockquote>
+<p>The <a href="https://github.com/langgenius/dify">Dify official site</a> already has detailed deployment tutorials, and you can find guides on Bilibili or YouTube too, so I won’t repeat those here. For source code deployment (the main method in this article), once you’ve cloned the repo, the key is to follow the steps in the <code>README.md</code> files under the <code>dify/api</code> and <code>dify/web</code> folders step by step. This post focuses on deploying Dify on AWS and some pitfalls I encountered.</p>
+<p>Tools used:</p>
 <ul>
-<li>4: Read (r)</li>
-<li>2: Write (w)</li>
-<li>1: Execute (x)</li>
-</ul>
-<p>Examples:</p>
-<ul>
-<li><code>7 = 4 + 2 + 1</code> (read, write, execute)</li>
-<li><code>5 = 4 + 1</code> (read, execute)</li>
-<li><code>6 = 4 + 2</code> (read, write)</li>
-</ul>
-<p>For <strong>755</strong>:</p>
-<ul>
-<li><strong>Owner:</strong> Read, write, execute (<code>rwx</code>)</li>
-<li><strong>Group&#x2F;Others:</strong> Read, execute (<code>r-x</code>)</li>
+<li><strong>AWS EC2</strong> (LightSail is simpler but only free for three months, while basic EC2 is free for 12 months)</li>
+<li><strong>Git</strong></li>
+<li><strong>Python 3.11</strong> (Dify 0.12.0 and later only supports Python 3.11+)</li>
 </ul>
 <hr>
-<h1 id="Common-Git-Commands"><a href="#Common-Git-Commands" class="headerlink" title="Common Git Commands"></a><strong>Common Git Commands</strong></h1><h2 id="Git-Configuration"><a href="#Git-Configuration" class="headerlink" title="Git Configuration"></a><strong>Git Configuration</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> config <span class="token parameter variable">--global</span> user.name <span class="token string">"Your Name"</span>               <span class="token comment"># Set global username</span>
-<span class="token function">git</span> config <span class="token parameter variable">--global</span> user.email <span class="token string">"your.email@example.com"</span> <span class="token comment"># Set global email</span>
-<span class="token function">git</span> config <span class="token parameter variable">--list</span>                                       <span class="token comment"># View current configuration</span>
-<span class="token function">git</span> config <span class="token parameter variable">--global</span> core.editor <span class="token function">vim</span>                    <span class="token comment"># Set default editor</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code"><a href="#1-Launching-an-AWS-EC2-Instance-and-Connecting-via-VS-Code" class="headerlink" title="1. Launching an AWS EC2 Instance and Connecting via VS Code"></a>1. Launching an AWS EC2 Instance and Connecting via VS Code</h2><ol>
+<li><p>After registering with AWS, search for “EC2” in the top-left search bar, click on the first result, and then click “Launch Instance” to create a new instance.</p>
+<p><img src="/en/../images/13/2_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>In the instance creation page, select Ubuntu as the operating system and an instance labeled <strong>Free Tier Eligible</strong> (no restrictions for paid users).<br><strong>If you don’t have a key pair, make sure to create and download one</strong>—this is essential for connecting to the server later. Once configured, launch the instance and wait for it to start.</p>
+<p><img src="/en/../images/13/5_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p>Go back to the main EC2 page, where you can view your created instances under the “Instances” section. Configure the security group to allow connections from your local browser to the Dify server later.</p>
+<p><img src="/en/../images/13/10_awsec2-imageonline.co-merged.jpg"></p>
+</li>
+<li><p><a href="https://code.visualstudio.com/">VS Code</a> is fantastic for SSH connections. Follow <a href="https://medium.com/@christyjacob4/using-vscode-remotely-on-an-ec2-instance-7822c4032cff">this tutorial</a> for details.<br>The key mentioned in the tutorial is the key pair we created earlier.</p>
+</li>
+</ol>
+<hr>
+<h2 id="2-Running-Dify"><a href="#2-Running-Dify" class="headerlink" title="2. Running Dify"></a>2. Running Dify</h2><p>The rest of the process is identical to the <a href="https://docs.dify.ai/getting-started/install-self-hosted/local-source-code">local installation tutorial for Dify</a>.<br>Here are a few key points to watch out for:</p>
+<p>Since the free EC2 instance has limited performance (1 GB RAM), most tasks won’t run. You can use <strong>swap space</strong> (using disk as virtual RAM), but this makes compiling extremely slow. If you can, go for a better server… I recommend a server with at least 2 GB RAM (even then, you’ll need to configure swap space).</p>
+<p>To configure swap space:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> fallocate <span class="token parameter variable">-l</span> 4G /swapfile  <span class="token comment"># Create a 4GB swap file</span>
+<span class="token function">sudo</span> <span class="token function">chmod</span> <span class="token number">600</span> /swapfile        <span class="token comment"># Set file permissions to 600 (read/write for root only)</span>
+<span class="token function">sudo</span> <span class="token function">mkswap</span> /swapfile           <span class="token comment"># Format the file as swap space</span>
+<span class="token function">sudo</span> <span class="token function">swapon</span> /swapfile           <span class="token comment"># Enable the swap file</span>
+<span class="token function">swapon</span> <span class="token parameter variable">--show</span>                   <span class="token comment"># Display enabled swap spaces</span>
+/swapfile none swap sw <span class="token number">0</span> <span class="token number">0</span>      <span class="token comment"># Add swap configuration to fstab for persistence</span>
+<span class="token function">free</span> <span class="token parameter variable">-m</span>                         <span class="token comment"># View memory and swap usage</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="Repository-Operations"><a href="#Repository-Operations" class="headerlink" title="Repository Operations"></a><strong>Repository Operations</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> init                          <span class="token comment"># Initialize a new Git repository</span>
-<span class="token function">git</span> clone <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>              <span class="token comment"># Clone a remote repository locally</span>
-<span class="token function">git</span> status                        <span class="token comment"># View the current branch status</span>
-<span class="token function">git</span> log                           <span class="token comment"># View commit history</span>
-<span class="token function">git</span> log <span class="token parameter variable">--oneline</span>                 <span class="token comment"># Simplified commit history</span>
-<span class="token function">git</span> show <span class="token operator">&lt;</span>commit_hash<span class="token operator">></span>            <span class="token comment"># View details of a specific commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>To connect your local machine to the Dify platform hosted on the server, update the <code>127.0.0.1</code> parts in both <code>dify/api/.env</code> and <code>dify/web/.env.local</code> files to the appropriate server IP address.</p>
+<p><strong>Important: Do not modify the <code>CODE_EXECUTION_ENDPOINT</code> line:</strong></p>
+<pre class="line-numbers language-none"><code class="language-none"># CODE EXECUTION CONFIGURATION
+CODE_EXECUTION_ENDPOINT&#x3D;http:&#x2F;&#x2F;127.0.0.1:8194<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<h2 id="Branch-Management"><a href="#Branch-Management" class="headerlink" title="Branch Management"></a><strong>Branch Management</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch                        <span class="token comment"># List local branches</span>
-<span class="token function">git</span> branch <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>          <span class="token comment"># Create a new branch</span>
-<span class="token function">git</span> checkout <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>        <span class="token comment"># Switch to a specific branch</span>
-<span class="token function">git</span> checkout <span class="token parameter variable">-b</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Create and switch to a new branch</span>
-<span class="token function">git</span> merge <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>           <span class="token comment"># Merge a branch into the current branch</span>
-<span class="token function">git</span> branch <span class="token parameter variable">-d</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Delete a local branch</span>
-<span class="token function">git</span> branch <span class="token parameter variable">-D</span> <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>       <span class="token comment"># Force delete a local branch</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="Making-Changes"><a href="#Making-Changes" class="headerlink" title="Making Changes"></a><strong>Making Changes</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> <span class="token function">add</span> <span class="token operator">&lt;</span>file<span class="token operator">></span>                    <span class="token comment"># Add a file to the staging area</span>
-<span class="token function">git</span> <span class="token function">add</span> <span class="token builtin class-name">.</span>                         <span class="token comment"># Add all files in the current directory</span>
-<span class="token function">git</span> commit <span class="token parameter variable">-m</span> <span class="token string">"commit message"</span>    <span class="token comment"># Commit changes with a message</span>
-<span class="token function">git</span> commit <span class="token parameter variable">--amend</span>                <span class="token comment"># Modify the previous commit</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="Remote-Repository-Operations"><a href="#Remote-Repository-Operations" class="headerlink" title="Remote Repository Operations"></a><strong>Remote Repository Operations</strong></h4><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> remote <span class="token parameter variable">-v</span>                     <span class="token comment"># View remote repository URLs</span>
-<span class="token function">git</span> remote <span class="token function">add</span> origin <span class="token operator">&lt;</span>repo_url<span class="token operator">></span>  <span class="token comment"># Add a remote repository</span>
-<span class="token function">git</span> push origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Push a branch to the remote repository</span>
-<span class="token function">git</span> pull origin <span class="token operator">&lt;</span>branch_name<span class="token operator">></span>     <span class="token comment"># Pull updates from the remote repository</span>
-<span class="token function">git</span> fetch origin                  <span class="token comment"># Fetch updates without merging</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Stashing"><a href="#Stashing" class="headerlink" title="Stashing"></a><strong>Stashing</strong></h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> stash                         <span class="token comment"># Save current progress</span>
-<span class="token function">git</span> stash list                    <span class="token comment"># View saved stashes</span>
-<span class="token function">git</span> stash apply                   <span class="token comment"># Restore the most recent stash</span>
-<span class="token function">git</span> stash <span class="token function">clear</span>                   <span class="token comment"># Clear all stashes</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="99-My-Dify-Mini-App-Laopo"><a href="#99-My-Dify-Mini-App-Laopo" class="headerlink" title="99. My Dify Mini-App (Laopo)"></a>99. My Dify Mini-App (Laopo)</h2><p>Available on my Chinese page. Feel free to check it out <a href="https://zcpisme.github.io/2024/11/27/13_2024-11-26-AWS%E4%B8%8A%E7%9A%84Dify/">here</a>!</p>
 ]]></content>
       <categories>
-        <category>Programming Basics</category>
+        <category>Dify</category>
       </categories>
       <tags>
-        <tag>Linux</tag>
-        <tag>Git</tag>
-        <tag>common commands</tag>
+        <tag>Dify</tag>
+        <tag>Anime</tag>
+        <tag>Rem!</tag>
       </tags>
   </entry>
   <entry>
@@ -509,7 +509,7 @@ git config --global user.email &quot;Github email address&quot;<span aria-hidden
 
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">ssh-keygen -t rsa -C &quot;Github email address&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#122;&#99;&#x70;&#x69;&#x73;&#x6d;&#101;&#64;&#117;&#x63;&#104;&#105;&#x63;&#97;&#x67;&#x6f;&#46;&#x65;&#100;&#117;">&#122;&#99;&#x70;&#x69;&#x73;&#x6d;&#101;&#64;&#117;&#x63;&#104;&#105;&#x63;&#97;&#x67;&#x6f;&#46;&#x65;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
+<p>For example, if my GitHub username is <strong>zcpisme</strong>, using <strong><a href="mailto:&#122;&#x63;&#112;&#105;&#x73;&#109;&#101;&#x40;&#117;&#99;&#x68;&#105;&#x63;&#97;&#x67;&#111;&#46;&#x65;&#100;&#117;">&#122;&#x63;&#112;&#105;&#x73;&#109;&#101;&#x40;&#117;&#99;&#x68;&#105;&#x63;&#97;&#x67;&#111;&#46;&#x65;&#100;&#117;</a></strong> (an email I made up), then you would enter in the CMD:</p>
 <pre class="line-numbers language-cmd" data-language="cmd"><code class="language-cmd">git config --global user.name &quot;zcpisme&quot;
 git config --global user.email &quot;zcpisme@uchicago.edu&quot;
 ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -525,7 +525,7 @@ ssh-keygen -t rsa -C &quot; zcpisme@uchicago.edu&quot;<span aria-hidden="true" c
 <p><img src="/en/../images/1/1_gitrsa3.png"></p>
 <p>For the title, you can choose any name (your email is recommended), and paste the content from the id_rsa.pub you copied earlier into the key section.</p>
 <blockquote>
-<p>Can test connection by using ssh -T <a href="mailto:&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;">&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>Can test connection by using ssh -T <a href="mailto:&#103;&#105;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#x2e;&#x63;&#x6f;&#x6d;">&#103;&#105;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 </blockquote>
 <p>With this, the connection to Github is complete.</p>
 <h3 id="Create-a-Repository-Named-username-github-io"><a href="#Create-a-Repository-Named-username-github-io" class="headerlink" title="Create a Repository Named username.github.io"></a>Create a Repository Named username.github.io</h3><p>At the top right corner, click on the plus sign and select New repository</p>
@@ -856,47 +856,6 @@ hexo d<span aria-hidden="true" class="line-numbers-rows"><span></span><span></sp
       </tags>
   </entry>
   <entry>
-    <title>Copulas I — Probability Integral Transform</title>
-    <url>/en/2024/03/10/4_2024-03-10-CopulasI-Probability%20Integral%20Transform/</url>
-    <content><![CDATA[<p> When I wrote this article, I was enjoying my spring break after winter quarter (Greetings from Atlanta😃). Initially, my intention was to delve into the intricacies of Copulas. However, I realized the paramount importance of laying a solid foundation by elucidating the basic concept of the Probability Integral Transform before advancing further.</p>
-<h2 id="Definition-Proof"><a href="#Definition-Proof" class="headerlink" title="Definition &amp; Proof"></a>Definition &amp; Proof</h2><blockquote>
-<p><strong>Definition</strong>: For a random variable $X$, the function $F$ defined by </p>
-<p>$$F_{X}(x) &#x3D; P(X \leq x),\quad x \in \mathbb{R}$$, is called is called the cumulative distribution function (<strong>CDF</strong>) or, more simply, the distribution function of \(X\).</p>
-</blockquote>
-<p>It’s crucial to recognize that the CDF is a non-decreasing function. This implies that if \(a \leq b\), then \(F_X(a) \leq F_X(b)\). With this understanding in place, let’s turn our attention to the focal point of today’s discussion: <strong>Probability Integral Transform</strong>.</p>
-<blockquote>
-<p><strong>Theorem</strong>: Suppose that a random variable \(X\) has a continuous distribution for which the cumulative distribution function (CDF) is \(F_{X}\). The random variable \(Y\) defined as \(Y :&#x3D; F_X(X)\), then </p>
-<p>$$Y  \sim \text{Uniform}(0, 1)$$</p>
-<blockquote>
-<p><strong>proof</strong>: Since \(Y &#x3D; F_X(X)\), \(0 \leq y \leq 1\), this also leads to \(P(Y &gt; 1) &#x3D; P(Y &lt; 0) &#x3D; 0\). Also, \(P(F_X(X) \leq y) &#x3D; P(X \leq F^{-1}_X(y))\) because \(P(F_X(X) \leq y)\) simply means we want to find a \(x\) such that \(y\) is the quantile of \(X\).</p>
-<p>Thus, we can get,</p>
-<p>$$\begin{equation} \label{eq2}<br>\begin{aligned}<br>F_Y(y) &amp;&#x3D; P(Y \leq y)  \\<br>    &amp;&#x3D; P(F_X(X) \leq y) \\<br>       &amp;&#x3D; P(X \leq F_X^{-1}(y)) \\<br>       &amp;&#x3D; F_X(F_X^{-1}(y)) \\<br>       &amp;&#x3D; y<br>   \end{aligned}<br>\end{equation}$$</p>
-</blockquote>
-<blockquote>
-<p><strong>Note</strong>: The proof hinges on the increasing of \(F^{-1}_X(y)\). In cases where \(F^{-1}_X(y)\) does not increase (for example, if \(F_X\) is constant between \(x_0\) and \(x_1\)), we can employ a generalized form: </p>
-<p>$$F^{-1}_X(y) &#x3D; \inf\{x : F_X(x) \geq y\}$$</p>
-<p>Following this definition leads to the same conclusion.</p>
-</blockquote>
-</blockquote>
-<h2 id="Applications"><a href="#Applications" class="headerlink" title="Applications"></a>Applications</h2><p><strong>Simulation of Random Variables</strong>:</p>
-<p>Imagine the challenge of selecting a random number that adheres to the standard normal distribution—or any distribution for that matter. It’s not as simple as randomly choosing a number and declaring, “This follows a normal distribution!” Fortunately, there’s a clever approach to ensure accuracy.</p>
-<ul>
-<li>Start by selecting a number from a uniform distribution, which essentially means choosing any number between 0 and 1.</li>
-<li>Next, calculate the inverse cumulative distribution function (CDF) of the standard normal distribution, denoted as \(x &#x3D; \Phi^{-1}(u)\). The resulting \(x\) is precisely what we’re looking for: a value that conforms to the standard normal distribution.</li>
-</ul>
-<p><strong>Copulas</strong>:</p>
-<p>Intuitively, this method helps us to understand the randomness and dependence of random variables, but let’s talk about this in the next post. </p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>We briefly introduced an amazing theorem, Probability Integral Transform. In one words, PIT tells us that the probabilities of outcomes for any random variable into a uniform distribution. This theorem is essential for Copula, and see you next time.</p>
-]]></content>
-      <categories>
-        <category>Mathematics</category>
-      </categories>
-      <tags>
-        <tag>Probability</tag>
-        <tag>Mathematics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Simple NLP — Sentiment Analysis</title>
     <url>/en/2024/03/08/3_2024-03-08-Simple%20NLP%20%E2%80%94%20Sentiment%20Analysis/</url>
     <content><![CDATA[<blockquote>
@@ -994,6 +953,47 @@ pipe<span class="token punctuation">(</span><span class="token string">'Today I 
         <tag>Natural Language Processing</tag>
         <tag>Deep Learning</tag>
         <tag>Sentiment Analysis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Copulas I — Probability Integral Transform</title>
+    <url>/en/2024/03/10/4_2024-03-10-CopulasI-Probability%20Integral%20Transform/</url>
+    <content><![CDATA[<p> When I wrote this article, I was enjoying my spring break after winter quarter (Greetings from Atlanta😃). Initially, my intention was to delve into the intricacies of Copulas. However, I realized the paramount importance of laying a solid foundation by elucidating the basic concept of the Probability Integral Transform before advancing further.</p>
+<h2 id="Definition-Proof"><a href="#Definition-Proof" class="headerlink" title="Definition &amp; Proof"></a>Definition &amp; Proof</h2><blockquote>
+<p><strong>Definition</strong>: For a random variable $X$, the function $F$ defined by </p>
+<p>$$F_{X}(x) &#x3D; P(X \leq x),\quad x \in \mathbb{R}$$, is called is called the cumulative distribution function (<strong>CDF</strong>) or, more simply, the distribution function of \(X\).</p>
+</blockquote>
+<p>It’s crucial to recognize that the CDF is a non-decreasing function. This implies that if \(a \leq b\), then \(F_X(a) \leq F_X(b)\). With this understanding in place, let’s turn our attention to the focal point of today’s discussion: <strong>Probability Integral Transform</strong>.</p>
+<blockquote>
+<p><strong>Theorem</strong>: Suppose that a random variable \(X\) has a continuous distribution for which the cumulative distribution function (CDF) is \(F_{X}\). The random variable \(Y\) defined as \(Y :&#x3D; F_X(X)\), then </p>
+<p>$$Y  \sim \text{Uniform}(0, 1)$$</p>
+<blockquote>
+<p><strong>proof</strong>: Since \(Y &#x3D; F_X(X)\), \(0 \leq y \leq 1\), this also leads to \(P(Y &gt; 1) &#x3D; P(Y &lt; 0) &#x3D; 0\). Also, \(P(F_X(X) \leq y) &#x3D; P(X \leq F^{-1}_X(y))\) because \(P(F_X(X) \leq y)\) simply means we want to find a \(x\) such that \(y\) is the quantile of \(X\).</p>
+<p>Thus, we can get,</p>
+<p>$$\begin{equation} \label{eq2}<br>\begin{aligned}<br>F_Y(y) &amp;&#x3D; P(Y \leq y)  \\<br>    &amp;&#x3D; P(F_X(X) \leq y) \\<br>       &amp;&#x3D; P(X \leq F_X^{-1}(y)) \\<br>       &amp;&#x3D; F_X(F_X^{-1}(y)) \\<br>       &amp;&#x3D; y<br>   \end{aligned}<br>\end{equation}$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Note</strong>: The proof hinges on the increasing of \(F^{-1}_X(y)\). In cases where \(F^{-1}_X(y)\) does not increase (for example, if \(F_X\) is constant between \(x_0\) and \(x_1\)), we can employ a generalized form: </p>
+<p>$$F^{-1}_X(y) &#x3D; \inf\{x : F_X(x) \geq y\}$$</p>
+<p>Following this definition leads to the same conclusion.</p>
+</blockquote>
+</blockquote>
+<h2 id="Applications"><a href="#Applications" class="headerlink" title="Applications"></a>Applications</h2><p><strong>Simulation of Random Variables</strong>:</p>
+<p>Imagine the challenge of selecting a random number that adheres to the standard normal distribution—or any distribution for that matter. It’s not as simple as randomly choosing a number and declaring, “This follows a normal distribution!” Fortunately, there’s a clever approach to ensure accuracy.</p>
+<ul>
+<li>Start by selecting a number from a uniform distribution, which essentially means choosing any number between 0 and 1.</li>
+<li>Next, calculate the inverse cumulative distribution function (CDF) of the standard normal distribution, denoted as \(x &#x3D; \Phi^{-1}(u)\). The resulting \(x\) is precisely what we’re looking for: a value that conforms to the standard normal distribution.</li>
+</ul>
+<p><strong>Copulas</strong>:</p>
+<p>Intuitively, this method helps us to understand the randomness and dependence of random variables, but let’s talk about this in the next post. </p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>We briefly introduced an amazing theorem, Probability Integral Transform. In one words, PIT tells us that the probabilities of outcomes for any random variable into a uniform distribution. This theorem is essential for Copula, and see you next time.</p>
+]]></content>
+      <categories>
+        <category>Mathematics</category>
+      </categories>
+      <tags>
+        <tag>Probability</tag>
+        <tag>Mathematics</tag>
       </tags>
   </entry>
   <entry>
