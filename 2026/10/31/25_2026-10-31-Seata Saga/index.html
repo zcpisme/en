@@ -1,0 +1,617 @@
+<!DOCTYPE html><html data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions | CP DataStation</title><meta name="author" content="Chupeng Zheng"><meta name="copyright" content="Chupeng Zheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Our bank’s core system still runs on that old mainframe. Recently the team has been pushing a modernization effort, slowly migrating it off onto a new distributed architecture. The moment I got into i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions">
+<meta property="og:url" content="https://zcpisme.github.io/en/2026/10/31/25_2026-10-31-Seata%20Saga/index.html">
+<meta property="og:site_name" content="CP DataStation">
+<meta property="og:description" content="Our bank’s core system still runs on that old mainframe. Recently the team has been pushing a modernization effort, slowly migrating it off onto a new distributed architecture. The moment I got into i">
+<meta property="og:locale">
+<meta property="og:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png">
+<meta property="article:published_time" content="2026-10-31T14:12:00.000Z">
+<meta property="article:modified_time" content="2026-10-31T11:29:07.314Z">
+<meta property="article:author" content="Chupeng Zheng">
+<meta property="article:tag" content="Seata">
+<meta property="article:tag" content="Saga">
+<meta property="article:tag" content="Distributed Transaction">
+<meta property="article:tag" content="Microservices">
+<meta property="article:tag" content="Transaction Compensation">
+<meta property="article:tag" content="State Machine">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions",
+  "url": "https://zcpisme.github.io/en/2026/10/31/25_2026-10-31-Seata%20Saga/",
+  "image": "https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png",
+  "datePublished": "2026-10-31T14:12:00.000Z",
+  "dateModified": "2026-10-31T11:29:07.314Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Chupeng Zheng",
+      "url": "https://zcpisme.github.io/en"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/en/img/favicon.png"><link rel="canonical" href="https://zcpisme.github.io/en/2026/10/31/25_2026-10-31-Seata%20Saga/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/en/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-JSY5BEFW3M"></script><script>window.dataLayer = window.dataLayer || []
+function gtag(){dataLayer.push(arguments)}
+gtag('js', new Date())
+gtag('config', 'G-JSY5BEFW3M')
+btf.addGlobalFn('pjaxComplete', () => {
+  gtag('config', 'G-JSY5BEFW3M', {'page_path': window.location.pathname})
+}, 'google_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/en/',
+  algolia: undefined,
+  localSearch: {"path":"/en/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">15</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">39</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/en/"><img class="site-icon" src="/en/img/favicon.png" alt="Logo"><span class="site-name">CP DataStation</span></a><a class="nav-page-title" href="/en/"><span class="site-name">Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-10-31T14:12:00.000Z" title="Created 2026-10-31 22:12:00">2026-10-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-10-31T11:29:07.314Z" title="Updated 2026-10-31 19:29:07">2026-10-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/en/categories/Distributed-Transaction/">Distributed Transaction</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>14mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>Our bank’s core system still runs on that old mainframe. Recently the team has been pushing a modernization effort, slowly migrating it off onto a new distributed architecture. The moment I got into it I was lost — I wasn’t at all familiar with distributed transactions; AT, TCC, Saga, XA were just names I’d heard floating around.</p>
+<p>So I’m learning on the fly. Seata is the distributed-transaction framework I’ve been focusing on lately, and its Saga mode happens to fit our migration scenario especially well: the legacy core can’t be touched, you can only call the interfaces it exposes, yet you still have to guarantee the data eventually reconciles. So this post is basically my study notes — written as I learn. If anything here is off, please feel free to correct me.</p>
+<hr>
+<h2 id="1-Getting-to-know-the-four-modes"><a href="#1-Getting-to-know-the-four-modes" class="headerlink" title="1. Getting to know the four modes"></a>1. Getting to know the four modes</h2><p>Seata gives four modes: <strong>AT &#x2F; TCC &#x2F; Saga &#x2F; XA</strong>. I couldn’t tell them apart at first; later I realized the dividing line is actually pretty practical — it comes down to <em>“can you modify the participant, and do you need to lock resources?”</em></p>
+<ul>
+<li><strong>AT</strong>: near-zero intrusion; the framework auto-records an <code>undo_log</code> to roll back. The catch: the participant must be a relational DB that supports local transactions, and you have to be able to touch it. Our old mainframe? No chance.</li>
+<li><strong>TCC</strong>: strong business intrusion — you write the try&#x2F;confirm&#x2F;cancel trio yourself. Great performance, but again it assumes you can modify the participant’s logic.</li>
+<li><strong>Saga</strong>: long flows, cross-system, unmodifiable participants — its home turf. Each step just calls an interface and pairs it with a compensation operation.</li>
+<li><strong>XA</strong>: protocol-based strong consistency, but resources stay locked until commit, so performance is poor; only for low-concurrency traditional scenarios.</li>
+</ul>
+<p>To keep myself from getting dizzy, I still made a table (this one genuinely helped when I was starting out):</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Intrusion</th>
+<th>Needs global lock?</th>
+<th>Fits</th>
+<th>Consistency</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AT</td>
+<td>Almost none (auto undo_log)</td>
+<td>Yes</td>
+<td>Most OLTP, relational DBs</td>
+<td>Strong</td>
+</tr>
+<tr>
+<td>TCC</td>
+<td>Strong (hand-write try&#x2F;confirm&#x2F;cancel)</td>
+<td>No</td>
+<td>Core high-concurrency, lockable resources</td>
+<td>Strong</td>
+</tr>
+<tr>
+<td><strong>Saga</strong></td>
+<td><strong>Medium (write compensation)</strong></td>
+<td><strong>No</strong></td>
+<td><strong>Long flows, cross-system, legacy</strong></td>
+<td><strong>Eventual</strong></td>
+</tr>
+<tr>
+<td>XA</td>
+<td>None (protocol-based)</td>
+<td>Yes (locked till commit)</td>
+<td>Traditional strong-consistency, low concurrency</td>
+<td>Strong</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Side note: Saga is way older than Seata — it comes from a 1987 paper titled <em>Sagas</em>. Seata uses the “Orchestration” flavor — a central state machine does the scheduling, instead of services shouting at each other (that variant is called “Choreography”). I picked this up from reading around, so it might not be perfectly precise.</p>
+</blockquote>
+<hr>
+<h2 id="2-What-Saga-is-actually-thinking"><a href="#2-What-Saga-is-actually-thinking" class="headerlink" title="2. What Saga is actually thinking"></a>2. What Saga is actually thinking</h2><p>I first assumed Saga was another two-phase-commit thing, then realized it doesn’t lock resources at all — it commits in one phase and cleans up via “compensation afterward.” The core idea is actually simple:</p>
+<p><strong>Split one big transaction into a chain of local transactions; give every step a “regret pill” (a compensation operation); if any step fails, undo everything you already did, in reverse order.</strong></p>
+<p>Take “placing an order” as the most straightforward example; the forward chain looks like this:</p>
+<pre class="line-numbers language-none"><code class="language-none">Forward execution (step by step):
+  deduct inventory  →  deduct balance  →  create order  →  success
+
+If &quot;deduct balance&quot; fails, compensate in reverse (LIFO):
+  compensate deduct balance  →  compensate deduct inventory<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>These are the points that took me a while to untangle:</p>
+<ol>
+<li><strong>Every state has both a “forward service” and a “compensation service.”</strong> E.g. “deduct inventory” maps to <code>reduce()</code>, and its regret pill is <code>compensateReduce()</code> (put the inventory back).</li>
+<li><strong>Failure compensates in reverse (last-in-first-out).</strong> Whichever succeeded last gets undone first. In the example above, inventory deduction already succeeded and balance deduction failed, so we only undo balance and inventory; the order was never created, so nothing to do there.</li>
+<li><strong>The compensation itself must be idempotent and re-entrant.</strong> A flaky network might retry compensation several times; your compensation logic has to survive that.</li>
+<li><strong>Watch out for “empty compensation”:</strong> sometimes the forward service never actually ran (say it timed out), yet the compensation request arrives first. Your compensation logic needs to recognize that and not blow up.</li>
+</ol>
+<p>To put all this into Seata Saga, the core is a <strong>State Machine</strong>.</p>
+<p>Before diving into code, seeing an actual state diagram made it click for me — here’s the example one from the official docs. You can already spot the forward steps each paired with a purple compensation node:</p>
+<p><img src="/en/../images/25/demo_statelang.png" alt="Example Saga state diagram"></p>
+<p><em>Forward steps each pair with a compensation node (source: Seata official documentation).</em></p>
+<hr>
+<h2 id="3-How-Seata-Saga-actually-runs"><a href="#3-How-Seata-Saga-actually-runs" class="headerlink" title="3. How Seata Saga actually runs"></a>3. How Seata Saga actually runs</h2><p>Seata Saga is held up by a few roles (this part I’m still digesting, so I’ll write it as I understand it):</p>
+<ul>
+<li><strong>StateMachineEngine</strong>: the “brain” embedded directly in your app. It loads the state machine definition, drives the flow, triggers compensation on failure, and records the whole process.</li>
+<li><strong>Statelang (state language)</strong>: a <strong>JSON</strong> file that describes the entire state machine — what states there are, which service each state calls, who compensates it on failure, where to go next. If hand-writing JSON feels tedious, there’s also an official <strong>Seata Saga Designer</strong> (an Eclipse-based drag-and-drop tool) to draw it and export.</li>
+<li><strong>Persistence log</strong>: the state machine definition and every execution trace get written to the database. This is the bit I think matters most — <strong>because the log lives in the DB, if the app crashes it can resume from the breakpoint on restart and finish the unfinished compensation.</strong> For a migration-era system like ours, the last thing we want is to get stuck halfway at 3 a.m.; that recovery ability is a hard requirement.</li>
+</ul>
+<blockquote>
+<p>Unlike AT &#x2F; TCC, Seata Saga <strong>generally doesn’t require deploying a separate Seata Server (the TC coordinator)</strong>. The state machine engine runs embedded in your application and coordinates through its own database tables, so deployment stays light. I didn’t expect this at first and assumed every mode needed a TC hanging around.</p>
+</blockquote>
+<p>Saga needs these tables (the DDL ships with the Seata release, usually under <code>seata/script</code>, look for the <code>saga</code>-related ones):</p>
+<ul>
+<li><code>seata_state_machine_def</code> —— state machine definition</li>
+<li><code>seata_state_machine_inst</code> —— state machine execution instance</li>
+<li><code>seata_state_inst</code> —— single state execution record</li>
+<li><code>seata_state_inst_log</code> —— state execution event log (this is what recovery relies on)</li>
+</ul>
+<hr>
+<h2 id="4-Hands-on-a-Saga-for-order-inventory-deduction"><a href="#4-Hands-on-a-Saga-for-order-inventory-deduction" class="headerlink" title="4. Hands-on: a Saga for order + inventory deduction"></a>4. Hands-on: a Saga for order + inventory deduction</h2><p>Reading concepts always felt floaty to me; I only really got it after typing it out. Below I’ll build a complete chain using “place an order → deduct inventory → deduct balance → create order, and if any step fails, compensate the already-completed steps in reverse.” This actually resembles what I picture as “new system calling the legacy core’s interfaces.”</p>
+<h3 id="1-Add-the-dependency"><a href="#1-Add-the-dependency" class="headerlink" title="1. Add the dependency"></a>1. Add the dependency</h3><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>io.seata<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>seata-saga-spring<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.0.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span> <span class="token comment">&lt;!-- use the Seata version you're actually on --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="2-Write-the-state-machine-JSON"><a href="#2-Write-the-state-machine-JSON" class="headerlink" title="2. Write the state machine JSON"></a>2. Write the state machine JSON</h3><p>Create <code>createOrderSaga.json</code> under <code>resources/statelang/</code>:</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+  <span class="token property">"Name"</span><span class="token operator">:</span> <span class="token string">"createOrderSaga"</span><span class="token punctuation">,</span>
+  <span class="token property">"Comment"</span><span class="token operator">:</span> <span class="token string">"deduct inventory, then balance, then create order; compensate in reverse on any failure"</span><span class="token punctuation">,</span>
+  <span class="token property">"StartState"</span><span class="token operator">:</span> <span class="token string">"ReduceInventory"</span><span class="token punctuation">,</span>
+  <span class="token property">"Version"</span><span class="token operator">:</span> <span class="token string">"1.0.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"States"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">"ReduceInventory"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"inventoryService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"reduce"</span><span class="token punctuation">,</span>
+      <span class="token property">"CompensateState"</span><span class="token operator">:</span> <span class="token string">"CompensateReduceInventory"</span><span class="token punctuation">,</span>
+      <span class="token property">"Next"</span><span class="token operator">:</span> <span class="token string">"ReduceBalance"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[inventoryId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[count]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"Output"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token property">"inventoryStatus"</span><span class="token operator">:</span> <span class="token string">"$.#root"</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+      <span class="token property">"Status"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token property">"#root == 0"</span><span class="token operator">:</span> <span class="token string">"SU"</span> <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"CompensateReduceInventory"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"inventoryService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"compensateReduce"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[inventoryId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[count]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"End"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"ReduceBalance"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"accountService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"reduce"</span><span class="token punctuation">,</span>
+      <span class="token property">"CompensateState"</span><span class="token operator">:</span> <span class="token string">"CompensateReduceBalance"</span><span class="token punctuation">,</span>
+      <span class="token property">"Next"</span><span class="token operator">:</span> <span class="token string">"CreateOrder"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[userId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[amount]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"Output"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token property">"balanceStatus"</span><span class="token operator">:</span> <span class="token string">"$.#root"</span> <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"CompensateReduceBalance"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"accountService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"compensateReduce"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[userId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[amount]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"End"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"CreateOrder"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"orderService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"create"</span><span class="token punctuation">,</span>
+      <span class="token property">"CompensateState"</span><span class="token operator">:</span> <span class="token string">"CompensateCreateOrder"</span><span class="token punctuation">,</span>
+      <span class="token property">"Next"</span><span class="token operator">:</span> <span class="token string">"Succeed"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[userId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[inventoryId]"</span><span class="token punctuation">,</span> <span class="token string">"$.[count]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"Output"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token property">"orderId"</span><span class="token operator">:</span> <span class="token string">"$.#root"</span> <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"CompensateCreateOrder"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"ServiceTask"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceName"</span><span class="token operator">:</span> <span class="token string">"orderService"</span><span class="token punctuation">,</span>
+      <span class="token property">"ServiceMethod"</span><span class="token operator">:</span> <span class="token string">"cancel"</span><span class="token punctuation">,</span>
+      <span class="token property">"Input"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"$.[orderId]"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"End"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token property">"Succeed"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">"Type"</span><span class="token operator">:</span> <span class="token string">"SucceedEnd"</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The first time I looked at this JSON I was lost; only after matching the fields one by one did it click: <code>CompensateState</code> is “who cleans up if this step fails,” <code>Next</code> is “where to go if it succeeds,” and <code>Input</code>&#x2F;<code>Output</code> are how parameters flow in and out.</p>
+<h3 id="3-Write-the-forward-compensation-services"><a href="#3-Write-the-forward-compensation-services" class="headerlink" title="3. Write the forward &#x2F; compensation services"></a>3. Write the forward &#x2F; compensation services</h3><p>The services exist as Spring Beans; the state machine finds them by <code>ServiceName</code>, and the method parameter order must line up with the <code>Input</code> in the JSON:</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Service</span><span class="token punctuation">(</span><span class="token string">"inventoryService"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">InventoryService</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">/** Forward: deduct inventory; return 0 means success */</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">String</span> inventoryId<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// TODO: real inventory deduction logic</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">/** Compensation: put the inventory back (must be idempotent) */</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">compensateReduce</span><span class="token punctuation">(</span><span class="token class-name">String</span> inventoryId<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// TODO: restore inventory logic</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token annotation punctuation">@Service</span><span class="token punctuation">(</span><span class="token string">"accountService"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AccountService</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">String</span> userId<span class="token punctuation">,</span> <span class="token class-name">BigDecimal</span> amount<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">compensateReduce</span><span class="token punctuation">(</span><span class="token class-name">String</span> userId<span class="token punctuation">,</span> <span class="token class-name">BigDecimal</span> amount<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token annotation punctuation">@Service</span><span class="token punctuation">(</span><span class="token string">"orderService"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">OrderService</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">create</span><span class="token punctuation">(</span><span class="token class-name">String</span> userId<span class="token punctuation">,</span> <span class="token class-name">String</span> inventoryId<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> <span class="token string">"order_123"</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token class-name">String</span> orderId<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="4-Wire-up-the-engine-and-the-template"><a href="#4-Wire-up-the-engine-and-the-template" class="headerlink" title="4. Wire up the engine and the template"></a>4. Wire up the engine and the template</h3><p>Configure the state machine engine and the call template, pointing at the datasource that persists things:</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Configuration</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SeataSagaConfig</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">StateMachineEngine</span> <span class="token function">stateMachineEngine</span><span class="token punctuation">(</span><span class="token class-name">DataSource</span> dataSource<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">DbStateMachineConfig</span> config <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DbStateMachineConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setDataSource</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>                          <span class="token comment">// state def + exec log both land here</span>
+        config<span class="token punctuation">.</span><span class="token function">setResources</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">&#123;</span><span class="token string">"classpath*:statelang/*.json"</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setEnableAsync</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                               <span class="token comment">// run async for better throughput</span>
+        <span class="token class-name">DefaultStateMachineEngine</span> engine <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DefaultStateMachineEngine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        engine<span class="token punctuation">.</span><span class="token function">setStateMachineConfig</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        engine<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                             <span class="token comment">// load state defs on startup</span>
+        <span class="token keyword">return</span> engine<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">SagaTransactionalTemplate</span> <span class="token function">sagaTransactionalTemplate</span><span class="token punctuation">(</span><span class="token class-name">StateMachineEngine</span> engine<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">SagaTransactionalTemplate</span> template <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SagaTransactionalTemplate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        template<span class="token punctuation">.</span><span class="token function">setStateMachineEngine</span><span class="token punctuation">(</span>engine<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        template<span class="token punctuation">.</span><span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token number">60000L</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                               <span class="token comment">// execution timeout (ms)</span>
+        <span class="token keyword">return</span> template<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>SagaTransactionalTemplate</code> took me a moment to grasp: it just wraps “start the state machine + wrap it in a transaction context,” so all you do is <code>execute(...)</code> and hand it over.</p>
+<h3 id="5-Fire-the-call"><a href="#5-Fire-the-call" class="headerlink" title="5. Fire the call"></a>5. Fire the call</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Autowired</span>
+<span class="token keyword">private</span> <span class="token class-name">SagaTransactionalTemplate</span> sagaTransactionalTemplate<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">createOrder</span><span class="token punctuation">(</span><span class="token class-name">OrderCmd</span> cmd<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> startParams <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    startParams<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"inventoryId"</span><span class="token punctuation">,</span> cmd<span class="token punctuation">.</span><span class="token function">getInventoryId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    startParams<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"count"</span><span class="token punctuation">,</span> cmd<span class="token punctuation">.</span><span class="token function">getCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    startParams<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"userId"</span><span class="token punctuation">,</span> cmd<span class="token punctuation">.</span><span class="token function">getUserId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    startParams<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token string">"amount"</span><span class="token punctuation">,</span> cmd<span class="token punctuation">.</span><span class="token function">getAmount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">String</span> businessKey <span class="token operator">=</span> <span class="token string">"createOrder_"</span> <span class="token operator">+</span> cmd<span class="token punctuation">.</span><span class="token function">getOrderId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token comment">// business key, for idempotency &amp; lookup</span>
+    <span class="token class-name">StateMachineInstance</span> inst <span class="token operator">=</span> sagaTransactionalTemplate<span class="token punctuation">.</span><span class="token function">execute</span><span class="token punctuation">(</span>
+            <span class="token string">"createOrderSaga"</span><span class="token punctuation">,</span>   <span class="token comment">// state machine name, matches JSON "Name"</span>
+            <span class="token keyword">null</span><span class="token punctuation">,</span>                <span class="token comment">// tenantId</span>
+            businessKey<span class="token punctuation">,</span>
+            startParams<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">ExecutionStatus</span><span class="token punctuation">.</span><span class="token constant">SU</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>inst<span class="token punctuation">.</span><span class="token function">getStatus</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token string">"order placed, id: "</span> <span class="token operator">+</span> inst<span class="token punctuation">.</span><span class="token function">getEndParams</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"orderId"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"order failed, auto-compensated, status="</span> <span class="token operator">+</span> inst<span class="token punctuation">.</span><span class="token function">getStatus</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="6-So-how-does-compensation-actually-happen"><a href="#6-So-how-does-compensation-actually-happen" class="headerlink" title="6. So how does compensation actually happen?"></a>6. So how does compensation actually happen?</h3><p>Suppose <code>accountService.reduce()</code> throws an exception:</p>
+<ol>
+<li>The engine catches it and marks <code>ReduceBalance</code> as failed;</li>
+<li>Following <code>CompensateState</code> backward, it calls <code>CompensateReduceBalance</code>, then <code>CompensateReduceInventory</code>;</li>
+<li>Each compensation result is also written to the log;</li>
+<li>Finally the state machine instance becomes <code>FA</code> (failed) — to the caller it means “order didn’t go through, and it’s already rolled back cleanly.”</li>
+</ol>
+<p>If the process crashes halfway, after restart the engine scans the unfinished instances and continues the compensation along <code>seata_state_inst_log</code> — that’s the “persistence” point from earlier, and the fallback we care about most during migration.</p>
+<hr>
+<h2 id="5-JSON-fields-I’ve-noted-so-far"><a href="#5-JSON-fields-I’ve-noted-so-far" class="headerlink" title="5. JSON fields I’ve noted so far"></a>5. JSON fields I’ve noted so far</h2><p>No need to memorize everything; just get the common ones familiar, then fill in as you write:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Name</code> &#x2F; <code>Version</code> &#x2F; <code>StartState</code></td>
+<td>state machine name, version, the entry state</td>
+</tr>
+<tr>
+<td><code>Type</code></td>
+<td>state type: <code>ServiceTask</code> (call a service), <code>Choice</code> (branch), <code>SucceedEnd</code>&#x2F;<code>FailEnd</code> (success&#x2F;failure end), <code>CompensationTrigger</code> (trigger compensation), <code>SubStateMachine</code> (sub state machine), <code>ScriptTask</code> (script)</td>
+</tr>
+<tr>
+<td><code>ServiceName</code> &#x2F; <code>ServiceMethod</code></td>
+<td>the service bean name and method to call</td>
+</tr>
+<tr>
+<td><code>CompensateState</code></td>
+<td>which compensation state to use if this one fails</td>
+</tr>
+<tr>
+<td><code>Next</code></td>
+<td>where to go on success</td>
+</tr>
+<tr>
+<td><code>Input</code> &#x2F; <code>Output</code></td>
+<td>in&#x2F;out parameter mapping, using JSONPath expressions (e.g. <code>$.[count]</code>, <code>$.#root</code> for the return value)</td>
+</tr>
+<tr>
+<td><code>Status</code></td>
+<td>translate a business return code into a status (<code>SU</code> success, <code>UN</code> unknown&#x2F;retry, <code>FA</code> failure triggers compensation — see the <code>ExecutionStatus</code> enum for your version)</td>
+</tr>
+<tr>
+<td><code>Retry</code></td>
+<td>retry policy: <code>Exceptions</code>, <code>MaxAttempts</code>, <code>IntervalSeconds</code>, <code>BackoffRate</code></td>
+</tr>
+<tr>
+<td><code>Catch</code></td>
+<td>catch exceptions and branch elsewhere</td>
+</tr>
+</tbody></table>
+<p><code>Choice</code> can fork based on context (e.g. route by amount to different risk checks); <code>SubStateMachine</code> can pull a complex sub-flow out for reuse. Together they can describe a fairly complicated business orchestration. I haven’t used those two in anger yet, just noting them down.</p>
+<hr>
+<h2 id="6-My-takeaways-on-Saga-so-far"><a href="#6-My-takeaways-on-Saga-so-far" class="headerlink" title="6. My takeaways on Saga so far"></a>6. My takeaways on Saga so far</h2><p><strong>The good</strong></p>
+<ul>
+<li>Doesn’t require participants to support local transactions — it can pull legacy systems and third parties into the transaction. During our migration, calling the legacy core’s interfaces leans on exactly this.</li>
+<li>One-phase commit, no global lock, so response time and throughput stay comfortable for long flows.</li>
+<li>Can recover after a crash, with the persistence log as the eventual-consistency backstop.</li>
+</ul>
+<p><strong>The pitfalls to watch</strong></p>
+<ul>
+<li><strong>Weak isolation</strong>: two Sagas concurrently editing the same resource can cause dirty reads or lost updates. Mitigations exist — semantic locks, re-read validation, version numbers, countermeasures — but I’m still reading up on these.</li>
+<li><strong>You write the compensation yourself</strong>, and it must be idempotent, re-entrant, and able to swallow “empty compensation” (compensation arriving before the forward ever ran).</li>
+<li><strong>“Unknown” states can show up</strong>: a service times out and you don’t know if it actually succeeded. That <code>UN</code> status often needs a human fallback, or a scheduled job to reconcile&#x2F;retry.</li>
+<li>Compared to AT’s “almost zero intrusion,” Saga’s intrusion is that <em>you</em> have to design the compensation semantics for every step.</li>
+</ul>
+<p>One line: <strong>Saga moves the “consistency” burden from the framework’s shoulders onto your business design.</strong> It doesn’t do the compensation for you — it only guarantees the compensation gets executed reliably, in order. The rest of the headache is on you.</p>
+<hr>
+<h2 id="7-Wrapping-up"><a href="#7-Wrapping-up" class="headerlink" title="7. Wrapping up"></a>7. Wrapping up</h2><ul>
+<li>Seata’s Saga mode is a distributed-transaction solution for <strong>long flows, cross-system, unmodifiable participants</strong> — it lines up unusually well with our stretch of migrating off the legacy core.</li>
+<li>Its core is a <strong>state machine</strong>: write the “forward steps + compensation steps” in JSON, the engine drives it, and on failure it compensates in reverse.</li>
+<li>It <strong>runs embedded in your app and recovers via the DB log</strong>, generally without deploying a separate Seata Server.</li>
+<li>The cost is weak isolation and compensation you must make idempotent — it fits scenarios where “eventual consistency” is acceptable, not strong-consistency core trades.</li>
+</ul>
+<p>Notes stop here for now. I’m still a beginner at distributed stuff, so if anything above is wrong, please be gentle and correct me. Once this actually goes live in the migration, I’ll probably come back and add a real war-story post.</p>
+<blockquote>
+<p>References: <a target="_blank" rel="noopener" href="https://seata.apache.org/">Seata official documentation</a> · <a target="_blank" rel="noopener" href="https://seata.apache.org/docs/v1.3/user/mode/saga/">Seata Saga mode</a></p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en">Chupeng Zheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en/2026/10/31/25_2026-10-31-Seata%20Saga/">https://zcpisme.github.io/en/2026/10/31/25_2026-10-31-Seata%20Saga/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/en/tags/Seata/">Seata</a><a class="post-meta__tags" href="/en/tags/Saga/">Saga</a><a class="post-meta__tags" href="/en/tags/Distributed-Transaction/">Distributed Transaction</a><a class="post-meta__tags" href="/en/tags/Microservices/">Microservices</a><a class="post-meta__tags" href="/en/tags/Transaction-Compensation/">Transaction Compensation</a><a class="post-meta__tags" href="/en/tags/State-Machine/">State Machine</a></div><div class="post-share"><div class="social-share" data-image="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/en/2026/03/05/24_2026-03-05-IoT101-3/" title="IoT101 Lesson1 WOL Wake-Up"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/24cover.jpg" onerror="onerror=null;src='/en/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">IoT101 Lesson1 WOL Wake-Up</div></div><div class="info-2"><div class="info-item-1">Getting Started with ESP IoT Development: WOL Wake-UpIn the previous article, we installed a “physical finger” on the computer to press the power button. It works reliably, but it still doesn’t feel very high-tech. If your motherboard supports it, there’s actually a more “hacker-style” method — Wake on LAN (WOL). Simply put, you send a secret signal to the network card, and it wakes up the entire computer by itself. 1. What Is a “Magic Packet”?Even after a computer is powered off, as long as ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Chupeng Zheng</div><div class="author-info-description"></div><div class="site-data"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">15</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">39</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/zcpisme" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://www.linkedin.com/in/chupeng-zheng-858348211/" target="_blank" title="linkedin"><i class="fab fa-linkedin"></i></a><a class="social-icon" href="mailto:zhengcp00@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">“Jasper Gwyn taught me that we aren’t characters, we’re stories,” said Rebecca. “We stop at the idea of being a character engaged in who knows what adventure, even a very simple one, but what we have to understand is that we are the whole story, not just that character. We are the wood where he walks, the bad guy who cheats him, the mess around him, all the people who pass, the color of things, the sounds.”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Getting-to-know-the-four-modes"><span class="toc-text">1. Getting to know the four modes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-What-Saga-is-actually-thinking"><span class="toc-text">2. What Saga is actually thinking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-How-Seata-Saga-actually-runs"><span class="toc-text">3. How Seata Saga actually runs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Hands-on-a-Saga-for-order-inventory-deduction"><span class="toc-text">4. Hands-on: a Saga for order + inventory deduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Add-the-dependency"><span class="toc-text">1. Add the dependency</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Write-the-state-machine-JSON"><span class="toc-text">2. Write the state machine JSON</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Write-the-forward-compensation-services"><span class="toc-text">3. Write the forward &#x2F; compensation services</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Wire-up-the-engine-and-the-template"><span class="toc-text">4. Wire up the engine and the template</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Fire-the-call"><span class="toc-text">5. Fire the call</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-So-how-does-compensation-actually-happen"><span class="toc-text">6. So how does compensation actually happen?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-JSON-fields-I%E2%80%99ve-noted-so-far"><span class="toc-text">5. JSON fields I’ve noted so far</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-My-takeaways-on-Saga-so-far"><span class="toc-text">6. My takeaways on Saga so far</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Wrapping-up"><span class="toc-text">7. Wrapping up</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/25_2026-10-31-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"/></a><div class="content"><a class="title" href="/en/2026/10/31/25_2026-10-31-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions">Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions</a><time datetime="2026-10-31T14:12:00.000Z" title="Created 2026-10-31 22:12:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/03/05/24_2026-03-05-IoT101-3/" title="IoT101 Lesson1 WOL Wake-Up"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/24cover.jpg" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="IoT101 Lesson1 WOL Wake-Up"/></a><div class="content"><a class="title" href="/en/2026/03/05/24_2026-03-05-IoT101-3/" title="IoT101 Lesson1 WOL Wake-Up">IoT101 Lesson1 WOL Wake-Up</a><time datetime="2026-03-05T14:12:00.000Z" title="Created 2026-03-05 22:12:00">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/03/05/23_2026-03-05-IoT101-2/" title="IoT101 Lesson2 Finger Robot"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/23cover.jpg" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="IoT101 Lesson2 Finger Robot"/></a><div class="content"><a class="title" href="/en/2026/03/05/23_2026-03-05-IoT101-2/" title="IoT101 Lesson2 Finger Robot">IoT101 Lesson2 Finger Robot</a><time datetime="2026-03-05T12:21:00.000Z" title="Created 2026-03-05 20:21:00">2026-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/03/04/22_2026-03-04-IoT101-1/" title="IoT101 Lesson1 Getting Started with ESP IoT Development"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/22cover.jpg" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="IoT101 Lesson1 Getting Started with ESP IoT Development"/></a><div class="content"><a class="title" href="/en/2026/03/04/22_2026-03-04-IoT101-1/" title="IoT101 Lesson1 Getting Started with ESP IoT Development">IoT101 Lesson1 Getting Started with ESP IoT Development</a><time datetime="2026-03-04T14:55:00.000Z" title="Created 2026-03-04 22:55:00">2026-03-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2025/01/12/15_2025-01-12-Docker%20Deployment/" title="Docker Usage and Configuration"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/15cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="Docker Usage and Configuration"/></a><div class="content"><a class="title" href="/en/2025/01/12/15_2025-01-12-Docker%20Deployment/" title="Docker Usage and Configuration">Docker Usage and Configuration</a><time datetime="2025-01-12T09:37:00.000Z" title="Created 2025-01-12 17:37:00">2025-01-12</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/en/js/utils.js"></script><script src="/en/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="https://events.vercount.one/js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search for Posts" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/en/js/search/local-search.js"></script></div></div></body></html>
