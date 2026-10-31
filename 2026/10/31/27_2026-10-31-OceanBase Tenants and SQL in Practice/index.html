@@ -1,0 +1,391 @@
+<!DOCTYPE html><html data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice | CP DataStation</title><meta name="author" content="Chupeng Zheng"><meta name="copyright" content="Chupeng Zheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="In Part 1 I got OB running in Docker and poked around the sys tenant — enough to say “it boots.” But sys is the system tenant, not where your business data belongs. To actually use this thing you have">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice">
+<meta property="og:url" content="https://zcpisme.github.io/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/index.html">
+<meta property="og:site_name" content="CP DataStation">
+<meta property="og:description" content="In Part 1 I got OB running in Docker and poked around the sys tenant — enough to say “it boots.” But sys is the system tenant, not where your business data belongs. To actually use this thing you have">
+<meta property="og:locale">
+<meta property="og:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png">
+<meta property="article:published_time" content="2026-10-31T12:06:00.000Z">
+<meta property="article:modified_time" content="2026-10-31T15:23:26.154Z">
+<meta property="article:author" content="Chupeng Zheng">
+<meta property="article:tag" content="OceanBase">
+<meta property="article:tag" content="Distributed Database">
+<meta property="article:tag" content="Learning Notes">
+<meta property="article:tag" content="Multi-Tenancy">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice",
+  "url": "https://zcpisme.github.io/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/",
+  "image": "https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png",
+  "datePublished": "2026-10-31T12:06:00.000Z",
+  "dateModified": "2026-10-31T15:23:26.154Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Chupeng Zheng",
+      "url": "https://zcpisme.github.io/en"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/en/img/favicon.png"><link rel="canonical" href="https://zcpisme.github.io/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/en/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-JSY5BEFW3M"></script><script>window.dataLayer = window.dataLayer || []
+function gtag(){dataLayer.push(arguments)}
+gtag('js', new Date())
+gtag('config', 'G-JSY5BEFW3M')
+btf.addGlobalFn('pjaxComplete', () => {
+  gtag('config', 'G-JSY5BEFW3M', {'page_path': window.location.pathname})
+}, 'google_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/en/',
+  algolia: undefined,
+  localSearch: {"path":"/en/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">47</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/en/"><img class="site-icon" src="/en/img/favicon.png" alt="Logo"><span class="site-name">CP DataStation</span></a><a class="nav-page-title" href="/en/"><span class="site-name">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-10-31T12:06:00.000Z" title="Created 2026-10-31 20:06:00">2026-10-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-10-31T15:23:26.154Z" title="Updated 2026-10-31 23:23:26">2026-10-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/en/categories/Distributed-Database/">Distributed Database</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">1.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>7mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>In Part 1 I got OB running in Docker and poked around the <code>sys</code> tenant — enough to say “it boots.” But <code>sys</code> is the system tenant, not where your business data belongs. To actually use this thing you have to understand OB’s <strong>multi-tenancy and resource model</strong>, which is where it diverges most from the standalone databases I knew. So this post covers: how to create a real tenant, how clients connect, and how data actually gets spread across nodes.</p>
+<blockquote>
+<p>Still learning notes, not an official manual. The tenant-creation commands are marked “check against your own environment,” because in a MINI_MODE single-node setup the zone names and available resources may differ from mine — run <code>SHOW ZONES;</code> before copying anything.</p>
+</blockquote>
+<hr>
+<h2 id="1-The-three-layer-model-tenant-resource-pool-Unit"><a href="#1-The-three-layer-model-tenant-resource-pool-Unit" class="headerlink" title="1. The three-layer model: tenant &#x2F; resource pool &#x2F; Unit"></a>1. The three-layer model: tenant &#x2F; resource pool &#x2F; Unit</h2><p>I assumed “connect to the database, create a schema, start working.” Reality corrected me — resources in OB are managed in layers:</p>
+<ul>
+<li><strong>Unit (resource unit)</strong>: describes “how much resource this tenant gets on one OBServer” — CPU, memory, log disk size. Think of it as a lightweight virtual container.</li>
+<li><strong>Resource Pool</strong>: made of one or more Units <strong>of the same spec</strong>, bound to specified Zones, then handed to a tenant as a whole.</li>
+<li><strong>Tenant</strong>: the standalone database instance your application actually uses, in either MySQL or Oracle mode, drawing resources from the pools it owns.</li>
+</ul>
+<p>So the chain is <strong>Cluster → Tenant → Database → Table</strong>, with Unit &#x2F; Pool being the vehicle for “how resources get sliced up and handed out.” The correct order for creating a tenant is <strong>Unit first, then Pool, then Tenant</strong> — skipping the first two and going straight to <code>CREATE TENANT</code> fails. That was my first stumble, and it’s not just my experience: the docs state that <code>RESOURCE_POOL_LIST</code> is mandatory when creating a tenant, so resource planning has to happen first.</p>
+<p>Drawing the layers out — together with OBProxy routing below — made it click much faster:</p>
+<p><img src="/en/../images/27/tenant-proxy.png" alt="Multi-tenancy and OBProxy routing"></p>
+<p><em>Tenants are isolated from each other; the app only talks to OBProxy, which routes each SQL to the right leader replica.</em></p>
+<hr>
+<h2 id="2-Hands-on-creating-a-MySQL-tenant"><a href="#2-Hands-on-creating-a-MySQL-tenant" class="headerlink" title="2. Hands-on: creating a MySQL tenant"></a>2. Hands-on: creating a MySQL tenant</h2><p>Below is a local single-node (MINI_MODE) example. Start by confirming your zone names and resource usage — don’t copy my <code>zone1</code> blindly:</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">SHOW</span> ZONES<span class="token punctuation">;</span>
+<span class="token comment">-- or for more detail</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> oceanbase<span class="token punctuation">.</span>DBA_OB_ZONES<span class="token punctuation">;</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> oceanbase<span class="token punctuation">.</span>DBA_OB_UNITS<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Step one, define a Unit spec</strong> (MINI_MODE has limited memory, so keep it small):</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> RESOURCE UNIT unit_s1
+  MAX_CPU <span class="token number">1</span><span class="token punctuation">,</span>
+  MEMORY_SIZE <span class="token string">'1G'</span><span class="token punctuation">,</span>
+  MAX_IOPS <span class="token number">1000</span><span class="token punctuation">,</span>
+  MIN_IOPS <span class="token number">1000</span><span class="token punctuation">,</span>
+  LOG_DISK_SIZE <span class="token string">'2G'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Step two, build a Resource Pool from that Unit</strong>, saying which zone it lands in:</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> RESOURCE POOL pool_mysql
+  UNIT<span class="token operator">=</span><span class="token string">'unit_s1'</span><span class="token punctuation">,</span>
+  UNIT_NUM<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span>
+  ZONE_LIST<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'zone1'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">-- use the actual zone name from SHOW ZONES</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Step three, create the tenant</strong>, attach the pool, and declare the compatibility mode plus allowed client IPs:</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> TENANT mysql_tenant
+  RESOURCE_POOL_LIST<span class="token operator">=</span><span class="token punctuation">(</span><span class="token string">'pool_mysql'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  PRIMARY_ZONE<span class="token operator">=</span><span class="token string">'zone1'</span><span class="token punctuation">,</span>
+  LOCALITY<span class="token operator">=</span><span class="token string">'F@zone1'</span>
+  <span class="token keyword">SET</span> OB_COMPATIBILITY_MODE<span class="token operator">=</span><span class="token string">'MYSQL'</span><span class="token punctuation">,</span>
+      OB_TCP_INVITED_NODES<span class="token operator">=</span><span class="token string">'%'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>PRIMARY_ZONE</code> and <code>LOCALITY</code> get their own section in Part 3; for now just fill in your zone name. <code>OB_TCP_INVITED_NODES=&#39;%&#39;</code> opens up the connection allowlist — <strong>leave it out and external clients simply cannot connect.</strong> That was my second stumble. (If you don’t specify it at all, the default is that only the local machine’s IP may connect.)</p>
+<p>Once it exists, connect as that tenant using the <code>user@tenant</code> form:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">obclient <span class="token parameter variable">-h127.0.0.1</span> <span class="token parameter variable">-P2881</span> -uroot@mysql_tenant <span class="token parameter variable">-A</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>The initial root has no password — change it. After that you can create databases and tables and write data much like ordinary MySQL:</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">DATABASE</span> shop<span class="token punctuation">;</span>
+<span class="token keyword">USE</span> shop<span class="token punctuation">;</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> item <span class="token punctuation">(</span>id <span class="token keyword">BIGINT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span> name <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> item <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'keyboard'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h2 id="3-How-clients-connect-direct-vs-OBProxy"><a href="#3-How-clients-connect-direct-vs-OBProxy" class="headerlink" title="3. How clients connect: direct vs OBProxy"></a>3. How clients connect: direct vs OBProxy</h2><p>For a single-node playground, connecting straight to the observer’s <code>2881</code> is easiest. In production you should put <strong>OBProxy (also called ODP, OceanBase Database Proxy)</strong> in front.</p>
+<p>OBProxy is a separate access-layer process that speaks the MySQL protocol. Its job: discover data distribution automatically and route each SQL to the OBServer holding the relevant leader replica, while handling connection management and load balancing. From the application’s point of view <strong>there is exactly one address to connect to</strong>, and it never has to know which node holds the data.</p>
+<p>Why do you need it in a distributed setup? Because the data is scattered across machines. Connect directly to one observer and any SQL touching data that lives elsewhere has to be served by a remote or distributed plan that reaches out to other nodes — OBProxy spares you that by routing and reusing connections up front.</p>
+<p>If you want to try OBProxy locally, there’s a community image (check the version and port of whatever you pull; the default proxy port is usually <code>2883</code>):</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">docker</span> run <span class="token parameter variable">-p</span> <span class="token number">2883</span>:2883 <span class="token parameter variable">-d</span> oceanbase/obproxy-ce
+<span class="token comment"># then point your app at 2883; the user@tenant form is unchanged</span>
+obclient <span class="token parameter variable">-h127.0.0.1</span> <span class="token parameter variable">-P2883</span> -uroot@mysql_tenant <span class="token parameter variable">-A</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>In production you run several OBProxy instances with a load balancer in front, so the proxy itself isn’t a single point of failure.</p>
+<hr>
+<h2 id="4-Partitioned-tables-how-data-gets-“spread-out”"><a href="#4-Partitioned-tables-how-data-gets-“spread-out”" class="headerlink" title="4. Partitioned tables: how data gets “spread out”"></a>4. Partitioned tables: how data gets “spread out”</h2><p>This is the entry point to distributed SQL. In a standalone database a table is basically one object; in OB a <strong>table is split into partitions, each partition maps to a Tablet, and the Tablet is the smallest unit of distribution, replication and balancing.</strong></p>
+<p>Common partitioning styles are Range, Hash, List and Key, and they can be combined. It matters for two reasons:</p>
+<ul>
+<li><strong>Horizontal scale</strong>: even a huge table can be split and spread across OBServers in different Zones instead of hitting a single machine’s ceiling.</li>
+<li><strong>Partition pruning</strong>: a query can scan only the relevant Tablets instead of the whole table.</li>
+</ul>
+<p>For example, hash-partition by user id into 8 partitions:</p>
+<pre class="line-numbers language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> orders <span class="token punctuation">(</span>
+  id <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>
+  user_id <span class="token keyword">BIGINT</span><span class="token punctuation">,</span>
+  amount <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> <span class="token keyword">PARTITION</span> <span class="token keyword">BY</span> <span class="token keyword">HASH</span><span class="token punctuation">(</span>user_id<span class="token punctuation">)</span> PARTITIONS <span class="token number">8</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>I used to think “just write the CREATE TABLE like MySQL and move on.” What I missed: <strong>the partitioning strategy decides how data is distributed, how hot spots get spread, and whether queries can prune.</strong> Pick badly and “distributed” ends up slower than a single box. This deserves its own study session.</p>
+<hr>
+<h2 id="5-Wrap-up-what’s-next"><a href="#5-Wrap-up-what’s-next" class="headerlink" title="5. Wrap-up &amp; what’s next"></a>5. Wrap-up &amp; what’s next</h2><ul>
+<li>OB’s resource model is <strong>Cluster → Tenant → Database → Table</strong>, with Unit &#x2F; Pool as the resource vehicle; creating a tenant is a <strong>Unit → Pool → Tenant</strong> sequence, and it won’t work without a pool.</li>
+<li>In production, connect through <strong>OBProxy</strong> and let the app know just one address.</li>
+<li><strong>Partitioned tables</strong> are the basis of data distribution; the strategy directly shapes performance and scalability.</li>
+</ul>
+<p>Next: <strong>high availability and elasticity</strong> — Paxos majority and the lease that prevents split-brain, how <code>locality</code> &#x2F; <code>primary_zone</code> decide replica placement and where leaders live, what happens when you scale out, and what actually happens when a Zone dies. That maps directly onto the disaster-recovery logic I care about most on our K8s setup.</p>
+<blockquote>
+<p>References:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.oceanbase.com/docs">OceanBase Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://hub.docker.com/r/oceanbase/oceanbase-ce">OceanBase CE Docker image</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.oceanbase.com/docs/community-obproxy-cn-1000000000045044">OBProxy documentation</a></li>
+</ul>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en">Chupeng Zheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/">https://zcpisme.github.io/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/en/tags/OceanBase/">OceanBase</a><a class="post-meta__tags" href="/en/tags/Distributed-Database/">Distributed Database</a><a class="post-meta__tags" href="/en/tags/Learning-Notes/">Learning Notes</a><a class="post-meta__tags" href="/en/tags/Multi-Tenancy/">Multi-Tenancy</a><a class="post-meta__tags" href="/en/tags/SQL/">SQL</a></div><div class="post-share"><div class="social-share" data-image="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png" onerror="onerror=null;src='/en/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">OceanBase Learning Notes (Part 3): High Availability and Elasticity</div></div><div class="info-2"><div class="info-item-1">In the first two parts I got OB running and created a tenant I could write data into — “it works.” This part is the bit a distributed database most needs you to understand: what entitles it to claim high availability and elastic scaling. Two things carry that: log streams + Paxos majority, and the automatic scheduling layered on top. This is also the disaster-recovery logic I most need to be clear-headed about on our production K8s + OB setup.  Learning notes again. Some of these mechanisms t...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/26cover.png" onerror="onerror=null;src='/en/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">OceanBase Learning Notes (Part 1): Getting It Running in Docker</div></div><div class="info-2"><div class="info-item-1">Our production stack runs on Kubernetes + OceanBase. Slightly embarrassing to admit, but I had never really worked with a distributed database before — my mental model was still “one MySQL &#x2F; Oracle instance on one box.” With the team moving onto OB, I couldn’t stay the person who only knows SELECT, so I started digging in. I happened to have a Windows 11 machine with Docker Desktop already installed, so I followed the official quick start, got the community edition running locally, and t...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/29cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring</div></div><div class="info-2"><div class="info-item-1">Parts 1 to 3 covered concepts, tenants and SQL, and high availability — mostly principles plus local experimentation. This final part lands on our real environment: Kubernetes + OceanBase. How do you run the cluster and tenants on K8s, how do you back them up, and how do you tell whether things are healthy? This closes out the series.  Final set of notes. With K8s and backup I’m mostly “working through the docs” — hands-on experience is still ahead of me — so this leans toward principles and ...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/26cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 1): Getting It Running in Docker</div></div><div class="info-2"><div class="info-item-1">Our production stack runs on Kubernetes + OceanBase. Slightly embarrassing to admit, but I had never really worked with a distributed database before — my mental model was still “one MySQL &#x2F; Oracle instance on one box.” With the team moving onto OB, I couldn’t stay the person who only knows SELECT, so I started digging in. I happened to have a Windows 11 machine with Docker Desktop already installed, so I followed the official quick start, got the community edition running locally, and t...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 3): High Availability and Elasticity</div></div><div class="info-2"><div class="info-item-1">In the first two parts I got OB running and created a tenant I could write data into — “it works.” This part is the bit a distributed database most needs you to understand: what entitles it to claim high availability and elastic scaling. Two things carry that: log streams + Paxos majority, and the automatic scheduling layered on top. This is also the disaster-recovery logic I most need to be clear-headed about on our production K8s + OB setup.  Learning notes again. Some of these mechanisms t...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Chupeng Zheng</div><div class="author-info-description"></div><div class="site-data"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">47</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/zcpisme" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://www.linkedin.com/in/chupeng-zheng-858348211/" target="_blank" title="linkedin"><i class="fab fa-linkedin"></i></a><a class="social-icon" href="mailto:zhengcp00@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">“Jasper Gwyn taught me that we aren’t characters, we’re stories,” said Rebecca. “We stop at the idea of being a character engaged in who knows what adventure, even a very simple one, but what we have to understand is that we are the whole story, not just that character. We are the wood where he walks, the bad guy who cheats him, the mess around him, all the people who pass, the color of things, the sounds.”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-The-three-layer-model-tenant-resource-pool-Unit"><span class="toc-text">1. The three-layer model: tenant &#x2F; resource pool &#x2F; Unit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Hands-on-creating-a-MySQL-tenant"><span class="toc-text">2. Hands-on: creating a MySQL tenant</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-How-clients-connect-direct-vs-OBProxy"><span class="toc-text">3. How clients connect: direct vs OBProxy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Partitioned-tables-how-data-gets-%E2%80%9Cspread-out%E2%80%9D"><span class="toc-text">4. Partitioned tables: how data gets “spread out”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Wrap-up-what%E2%80%99s-next"><span class="toc-text">5. Wrap-up &amp; what’s next</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/29cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"/></a><div class="content"><a class="title" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring">OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring</a><time datetime="2026-10-31T12:15:00.000Z" title="Created 2026-10-31 20:15:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 3): High Availability and Elasticity"/></a><div class="content"><a class="title" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity">OceanBase Learning Notes (Part 3): High Availability and Elasticity</a><time datetime="2026-10-31T12:12:00.000Z" title="Created 2026-10-31 20:12:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"/></a><div class="content"><a class="title" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</a><time datetime="2026-10-31T12:06:00.000Z" title="Created 2026-10-31 20:06:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/26cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 1): Getting It Running in Docker"/></a><div class="content"><a class="title" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker">OceanBase Learning Notes (Part 1): Getting It Running in Docker</a><time datetime="2026-10-31T11:55:00.000Z" title="Created 2026-10-31 19:55:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/21/25_2026-10-21-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"/></a><div class="content"><a class="title" href="/en/2026/10/21/25_2026-10-21-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions">Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions</a><time datetime="2026-10-21T10:12:00.000Z" title="Created 2026-10-21 18:12:00">2026-10-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/en/js/utils.js"></script><script src="/en/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="https://events.vercount.one/js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search for Posts" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/en/js/search/local-search.js"></script></div></div></body></html>

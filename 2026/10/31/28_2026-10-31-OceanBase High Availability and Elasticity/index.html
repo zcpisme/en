@@ -1,0 +1,355 @@
+<!DOCTYPE html><html data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OceanBase Learning Notes (Part 3): High Availability and Elasticity | CP DataStation</title><meta name="author" content="Chupeng Zheng"><meta name="copyright" content="Chupeng Zheng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="In the first two parts I got OB running and created a tenant I could write data into — “it works.” This part is the bit a distributed database most needs you to understand: what entitles it to claim h">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OceanBase Learning Notes (Part 3): High Availability and Elasticity">
+<meta property="og:url" content="https://zcpisme.github.io/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/index.html">
+<meta property="og:site_name" content="CP DataStation">
+<meta property="og:description" content="In the first two parts I got OB running and created a tenant I could write data into — “it works.” This part is the bit a distributed database most needs you to understand: what entitles it to claim h">
+<meta property="og:locale">
+<meta property="og:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png">
+<meta property="article:published_time" content="2026-10-31T12:12:00.000Z">
+<meta property="article:modified_time" content="2026-10-31T15:24:34.394Z">
+<meta property="article:author" content="Chupeng Zheng">
+<meta property="article:tag" content="OceanBase">
+<meta property="article:tag" content="Distributed Database">
+<meta property="article:tag" content="Learning Notes">
+<meta property="article:tag" content="High Availability">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OceanBase Learning Notes (Part 3): High Availability and Elasticity",
+  "url": "https://zcpisme.github.io/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/",
+  "image": "https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png",
+  "datePublished": "2026-10-31T12:12:00.000Z",
+  "dateModified": "2026-10-31T15:24:34.394Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Chupeng Zheng",
+      "url": "https://zcpisme.github.io/en"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/en/img/favicon.png"><link rel="canonical" href="https://zcpisme.github.io/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/en/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-JSY5BEFW3M"></script><script>window.dataLayer = window.dataLayer || []
+function gtag(){dataLayer.push(arguments)}
+gtag('js', new Date())
+gtag('config', 'G-JSY5BEFW3M')
+btf.addGlobalFn('pjaxComplete', () => {
+  gtag('config', 'G-JSY5BEFW3M', {'page_path': window.location.pathname})
+}, 'google_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/en/',
+  algolia: undefined,
+  localSearch: {"path":"/en/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"prismjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":300,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OceanBase Learning Notes (Part 3): High Availability and Elasticity',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">47</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/en/"><img class="site-icon" src="/en/img/favicon.png" alt="Logo"><span class="site-name">CP DataStation</span></a><a class="nav-page-title" href="/en/"><span class="site-name">OceanBase Learning Notes (Part 3): High Availability and Elasticity</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/en/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/en/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/en/categories/"><i class="fa-fw fas fa-th"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/en/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="https://zcpisme.github.io/"><i class="fa-fw fas fa-language"></i><span> 中文</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">OceanBase Learning Notes (Part 3): High Availability and Elasticity</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-10-31T12:12:00.000Z" title="Created 2026-10-31 20:12:00">2026-10-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-10-31T15:24:34.394Z" title="Updated 2026-10-31 23:24:34">2026-10-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/en/categories/Distributed-Database/">Distributed Database</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">1.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>7mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>In the first two parts I got OB running and created a tenant I could write data into — “it works.” This part is the bit a distributed database most needs you to understand: <strong>what entitles it to claim high availability and elastic scaling.</strong> Two things carry that: <strong>log streams + Paxos majority</strong>, and the automatic scheduling layered on top. This is also the disaster-recovery logic I most need to be clear-headed about on our production K8s + OB setup.</p>
+<blockquote>
+<p>Learning notes again. Some of these mechanisms took me a while to untangle, so I’ve marked the “I used to think… now I get it” moments for anyone starting out too.</p>
+</blockquote>
+<hr>
+<h2 id="1-The-consistency-core-log-stream-Paxos-majority"><a href="#1-The-consistency-core-log-stream-Paxos-majority" class="headerlink" title="1. The consistency core: log stream + Paxos majority"></a>1. The consistency core: log stream + Paxos majority</h2><p>The redo log of each partition (Tablet) flows into a <strong>log stream</strong>, and the log stream has replicas across Zones. One is the <strong>leader</strong>, which accepts writes; the rest are followers.</p>
+<p>Whether a write succeeds comes down to: <strong>a majority of replicas has persisted that redo log</strong>, and only then does the leader confirm the commit. That is what lets OB talk about high availability at all — <strong>lose a minority of nodes and, as long as a majority remains, the service is unaffected.</strong></p>
+<p>The leader is not a lifetime appointment — it lives on a <strong>lease</strong>. When elected it receives a lease, and while healthy it keeps renewing it. <strong>The leader only does leader work while its lease is valid.</strong> If its machine fails and the lease stops being renewed, then once the lease expires the followers elect a new leader and grant it a fresh lease. That is the actual guard against split-brain: under a network partition the old leader can at most serve until its lease runs out, so you never end up with two leaders serving writes at the same time.</p>
+<blockquote>
+<p>I used to think “primary-standby replication plus semi-sync is solid enough.” What I eventually understood: majority commit plus the lease is the real mechanism. Semi-sync is at best “try hard not to lose anything”; Paxos is “mathematically fine even if a minority is gone.”</p>
+</blockquote>
+<p><strong>One correction I have to flag about GTS</strong>, because I got this wrong at first: I had written that the new leader takes its timestamp from GTS and that this is what prevents split-brain. That’s not right. <strong>GTS (Global Timestamp Service)</strong> is not an anti-split-brain mechanism — it’s the service that generates continuously increasing timestamps within a tenant, used to stamp each transaction’s <strong>commit version</strong> and each statement&#x2F;transaction’s <strong>read version</strong>, which is how MVCC and globally consistent snapshots work. (It keeps timestamps from going backwards via its own replicas: before a new GTS leader takes over it replays the previous leader’s pre-allocated range.) Anti-split-brain is the majority + lease story above.</p>
+<p>Here’s the whole thing — how a write commits, and what happens when the leader dies:</p>
+<p><img src="/en/../images/28/paxos.png" alt="Log stream Paxos majority commit and leader election"></p>
+<p><em>Only the leader accepts writes; the redo log goes to followers, a majority persisted means committed; if the leader fails, a new one is elected.</em></p>
+<hr>
+<h2 id="2-Replica-placement-locality-and-primary-zone"><a href="#2-Replica-placement-locality-and-primary-zone" class="headerlink" title="2. Replica placement: locality and primary_zone"></a>2. Replica placement: locality and primary_zone</h2><p>Which Zones hold replicas, and where leaders prefer to sit, are controlled by two knobs — the two you touch most when operating this thing:</p>
+<ul>
+<li><strong>locality</strong>: the replica type and distribution of the tenant’s log streams across Zones. For example:<ul>
+<li><code>F@z1, F@z2, F@z3</code>: a full replica (F &#x3D; Full) in each of the three Zones.</li>
+<li><code>F@z1, F@z2, L@z3</code>: z3 holds a log replica (L &#x3D; Log; it stores redo logs but not the data, saving storage).</li>
+</ul>
+</li>
+<li><strong>primary_zone</strong>: which Zones leaders prefer. A semicolon <code>;</code> means priority ordering, a comma <code>,</code> means equal priority. <code>z1;z2;z3</code> means z1 is the most preferred place for leaders.</li>
+</ul>
+<p>How many data centers you can survive, and where the read&#x2F;write centre of gravity sits, comes down to these two working together.</p>
+<blockquote>
+<p>My mistake here: I assumed locality was frozen once the tenant was created. It isn’t — you can change it online with <code>ALTER TENANT ... SET locality = &#39;F@z1, F@z2, L@z3&#39;</code>, and OB will create &#x2F; drop &#x2F; migrate replicas until the layout matches. No downtime, no rebuild.</p>
+</blockquote>
+<hr>
+<h2 id="3-Elasticity-scaling-out-and-automatic-rebalancing"><a href="#3-Elasticity-scaling-out-and-automatic-rebalancing" class="headerlink" title="3. Elasticity: scaling out and automatic rebalancing"></a>3. Elasticity: scaling out and automatic rebalancing</h2><p>Scaling a traditional database often means downtime, or hand-rolled sharding. OB’s version is “add machines → it rebalances itself”:</p>
+<ol>
+<li>Add OBServers to the cluster (more capacity at the cluster level).</li>
+<li>Give the tenant a bigger resource spec — e.g. add Units to its resource pool, or raise <code>UNIT_NUM</code>.</li>
+<li>The new capacity forms new Units, and RootService <strong>splits</strong> log streams and <strong>migrates</strong> Tablets onto the new machines.</li>
+<li>Once load levels out across machines, the scale-out is done.</li>
+</ol>
+<p>Scale-in is the reverse: move and merge the log streams off the target machines, then retire them. The whole thing is owned by the <strong>balancing layer</strong> (log stream split&#x2F;merge plus Tablet migration) — nobody moves data by hand.</p>
+<p>What struck me: this is remarkably kind to operators. Adding a machine used to mean a pile of manual work; now it’s basically a declarative “give this tenant more resource,” and RootService does the rest.</p>
+<hr>
+<h2 id="4-What-happens-when-a-Zone-goes-down-the-DR-view"><a href="#4-What-happens-when-a-Zone-goes-down-the-DR-view" class="headerlink" title="4. What happens when a Zone goes down (the DR view)"></a>4. What happens when a Zone goes down (the DR view)</h2><p>This is the part that maps directly onto “we lost an AZ” on our Kubernetes setup:</p>
+<ul>
+<li><strong>A Zone holding only minority replicas goes down</strong>: the majority is still there, so the service is unaffected — you’ve just lost some redundancy, so fix the machine.</li>
+<li><strong>The Zone holding the leader goes down</strong>: the lease stops being renewed → the remaining replicas elect a new leader → service resumes. Transactions that hadn’t finished committing are recovered by replaying redo &#x2F; commit logs through the two-phase-commit state machine, ending in a consistent state.</li>
+</ul>
+<p>So for production, <strong>at least 3 Zones (3 replicas, tolerates losing 1)</strong> is the usual recommendation; a two-site-three-center layout typically runs <strong>5 replicas</strong> to tolerate losing an entire IDC. Translated to our K8s + OB world: if a Kubernetes availability zone drops out, OB sees it as a Zone going away, and everything above applies — <strong>understanding it at this level is what “high availability in the cloud” actually means.</strong></p>
+<hr>
+<h2 id="5-Wrap-up-what’s-next"><a href="#5-Wrap-up-what’s-next" class="headerlink" title="5. Wrap-up &amp; what’s next"></a>5. Wrap-up &amp; what’s next</h2><ul>
+<li>High availability &#x3D; <strong>log stream Paxos majority</strong> + <strong>lease-based protection against split-brain</strong>; locality &#x2F; primary_zone control replica placement and where leaders sit.</li>
+<li>Elasticity comes from RootService splitting and migrating automatically — scaling doesn’t involve moving data by hand.</li>
+<li>Zone failures are recovered by automatic re-election, provided enough replicas remain to form a majority.</li>
+</ul>
+<p>The last part lands on our actual environment: <strong>how to run OB on Kubernetes with ob-operator, how to back it up, and how to tell whether it’s healthy.</strong> This part was the theory; the next one is “how to put it into production.”</p>
+<blockquote>
+<p>References:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.oceanbase.com/docs/common-oceanbase-database-cn-1000000005682187">OceanBase Database architecture</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.oceanbase.com/docs">OceanBase system architecture</a></li>
+</ul>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en">Chupeng Zheng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://zcpisme.github.io/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/">https://zcpisme.github.io/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/en/tags/OceanBase/">OceanBase</a><a class="post-meta__tags" href="/en/tags/Distributed-Database/">Distributed Database</a><a class="post-meta__tags" href="/en/tags/Learning-Notes/">Learning Notes</a><a class="post-meta__tags" href="/en/tags/High-Availability/">High Availability</a></div><div class="post-share"><div class="social-share" data-image="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/29cover.png" onerror="onerror=null;src='/en/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring</div></div><div class="info-2"><div class="info-item-1">Parts 1 to 3 covered concepts, tenants and SQL, and high availability — mostly principles plus local experimentation. This final part lands on our real environment: Kubernetes + OceanBase. How do you run the cluster and tenants on K8s, how do you back them up, and how do you tell whether things are healthy? This closes out the series.  Final set of notes. With K8s and backup I’m mostly “working through the docs” — hands-on experience is still ahead of me — so this leans toward principles and ...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png" onerror="onerror=null;src='/en/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</div></div><div class="info-2"><div class="info-item-1">In Part 1 I got OB running in Docker and poked around the sys tenant — enough to say “it boots.” But sys is the system tenant, not where your business data belongs. To actually use this thing you have to understand OB’s multi-tenancy and resource model, which is where it diverges most from the standalone databases I knew. So this post covers: how to create a real tenant, how clients connect, and how data actually gets spread across nodes.  Still learning notes, not an official manual. The ten...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/29cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring</div></div><div class="info-2"><div class="info-item-1">Parts 1 to 3 covered concepts, tenants and SQL, and high availability — mostly principles plus local experimentation. This final part lands on our real environment: Kubernetes + OceanBase. How do you run the cluster and tenants on K8s, how do you back them up, and how do you tell whether things are healthy? This closes out the series.  Final set of notes. With K8s and backup I’m mostly “working through the docs” — hands-on experience is still ahead of me — so this leans toward principles and ...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/26cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 1): Getting It Running in Docker</div></div><div class="info-2"><div class="info-item-1">Our production stack runs on Kubernetes + OceanBase. Slightly embarrassing to admit, but I had never really worked with a distributed database before — my mental model was still “one MySQL &#x2F; Oracle instance on one box.” With the team moving onto OB, I couldn’t stay the person who only knows SELECT, so I started digging in. I happened to have a Windows 11 machine with Docker Desktop already installed, so I followed the official quick start, got the community edition running locally, and t...</div></div></div></a><a class="pagination-related" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"><img class="cover" src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-31</div><div class="info-item-2">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</div></div><div class="info-2"><div class="info-item-1">In Part 1 I got OB running in Docker and poked around the sys tenant — enough to say “it boots.” But sys is the system tenant, not where your business data belongs. To actually use this thing you have to understand OB’s multi-tenancy and resource model, which is where it diverges most from the standalone databases I knew. So this post covers: how to create a real tenant, how clients connect, and how data actually gets spread across nodes.  Still learning notes, not an official manual. The ten...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/en/img/avatar.jpg" onerror="this.onerror=null;this.src='/en/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Chupeng Zheng</div><div class="author-info-description"></div><div class="site-data"><a href="/en/archives/"><div class="headline">Articles</div><div class="length-num">19</div></a><a href="/en/tags/"><div class="headline">Tags</div><div class="length-num">47</div></a><a href="/en/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/zcpisme" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://www.linkedin.com/in/chupeng-zheng-858348211/" target="_blank" title="linkedin"><i class="fab fa-linkedin"></i></a><a class="social-icon" href="mailto:zhengcp00@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">“Jasper Gwyn taught me that we aren’t characters, we’re stories,” said Rebecca. “We stop at the idea of being a character engaged in who knows what adventure, even a very simple one, but what we have to understand is that we are the whole story, not just that character. We are the wood where he walks, the bad guy who cheats him, the mess around him, all the people who pass, the color of things, the sounds.”</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-The-consistency-core-log-stream-Paxos-majority"><span class="toc-text">1. The consistency core: log stream + Paxos majority</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Replica-placement-locality-and-primary-zone"><span class="toc-text">2. Replica placement: locality and primary_zone</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Elasticity-scaling-out-and-automatic-rebalancing"><span class="toc-text">3. Elasticity: scaling out and automatic rebalancing</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-What-happens-when-a-Zone-goes-down-the-DR-view"><span class="toc-text">4. What happens when a Zone goes down (the DR view)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Wrap-up-what%E2%80%99s-next"><span class="toc-text">5. Wrap-up &amp; what’s next</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/29cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring"/></a><div class="content"><a class="title" href="/en/2026/10/31/29_2026-10-31-OceanBase%20on%20K8s%20Backup%20and%20Monitoring/" title="OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring">OceanBase Learning Notes (Part 4): Production — K8s Deployment, Backup and Monitoring</a><time datetime="2026-10-31T12:15:00.000Z" title="Created 2026-10-31 20:15:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/28cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 3): High Availability and Elasticity"/></a><div class="content"><a class="title" href="/en/2026/10/31/28_2026-10-31-OceanBase%20High%20Availability%20and%20Elasticity/" title="OceanBase Learning Notes (Part 3): High Availability and Elasticity">OceanBase Learning Notes (Part 3): High Availability and Elasticity</a><time datetime="2026-10-31T12:12:00.000Z" title="Created 2026-10-31 20:12:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/27cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice"/></a><div class="content"><a class="title" href="/en/2026/10/31/27_2026-10-31-OceanBase%20Tenants%20and%20SQL%20in%20Practice/" title="OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice">OceanBase Learning Notes (Part 2): Tenants, Resources and SQL in Practice</a><time datetime="2026-10-31T12:06:00.000Z" title="Created 2026-10-31 20:06:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/26cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="OceanBase Learning Notes (Part 1): Getting It Running in Docker"/></a><div class="content"><a class="title" href="/en/2026/10/31/26_2026-10-31-OceanBase/" title="OceanBase Learning Notes (Part 1): Getting It Running in Docker">OceanBase Learning Notes (Part 1): Getting It Running in Docker</a><time datetime="2026-10-31T11:55:00.000Z" title="Created 2026-10-31 19:55:00">2026-10-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/en/2026/10/21/25_2026-10-21-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"><img src="https://gcore.jsdelivr.net/gh/zcpisme/images_hosting@main/cover/25cover.png" onerror="this.onerror=null;this.src='/en/img/404.jpg'" alt="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions"/></a><div class="content"><a class="title" href="/en/2026/10/21/25_2026-10-21-Seata%20Saga/" title="Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions">Seata Saga Learning Notes: State-Machine-Orchestrated Distributed Long Transactions</a><time datetime="2026-10-21T10:12:00.000Z" title="Created 2026-10-21 18:12:00">2026-10-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/en/js/utils.js"></script><script src="/en/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="https://events.vercount.one/js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search for Posts" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/en/js/search/local-search.js"></script></div></div></body></html>
