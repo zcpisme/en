@@ -1,0 +1,164 @@
+/* 宣传视频页 + 侧栏入口 —— ZCP 妙妙屋 */
+.promo-wrap {
+  margin: 0 0 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .28);
+}
+
+.promo-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.promo-note {
+  color: #858585;
+  font-size: .9rem;
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+.promo-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  justify-content: center;
+}
+
+.promo-chapters a {
+  display: inline-block;
+  padding: .32rem .8rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: rgba(73, 177, 245, .12);
+  color: #49b1f5;
+  font-size: .85rem;
+  line-height: 1.5;
+  transition: all .2s ease-in-out;
+}
+
+.promo-chapters a:hover {
+  background: #49b1f5;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* 侧栏公告里的视频入口 */
+.promo-teaser {
+  display: block;
+  margin-top: .7rem;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  line-height: 0;
+}
+
+.promo-teaser img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform .35s ease;
+}
+
+.promo-teaser:hover img {
+  transform: scale(1.04);
+}
+
+.promo-teaser-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .55);
+  border: 1.5px solid rgba(255, 255, 255, .85);
+  line-height: 1;
+}
+
+.promo-teaser-badge::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 15px;
+  border-style: solid;
+  border-width: 8px 0 8px 13px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.promo-teaser-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.2rem .5rem .35rem;
+  font-size: .78rem;
+  line-height: 1.4;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, .78), rgba(0, 0, 0, 0));
+}
+
+/* 首页 banner 上的入口按钮 */
+.hero-promo {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: .45rem;
+  margin: 1.6rem auto 0;
+  padding: .5rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  background: rgba(0, 0, 0, .28);
+  color: #fff !important;
+  font-size: .92rem;
+  letter-spacing: .02em;
+  text-decoration: none !important;
+  backdrop-filter: blur(4px);
+  transition: all .25s ease-in-out;
+}
+
+.hero-promo:hover {
+  background: #49b1f5;
+  border-color: #49b1f5;
+  transform: translateY(-2px);
+}
+
+.hero-promo-play {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  flex: 0 0 auto;
+}
+
+.hero-promo-play::after {
+  content: '';
+  position: absolute;
+  left: 6.5px;
+  top: 5px;
+  border-style: solid;
+  border-width: 3.2px 0 3.2px 5px;
+  border-color: transparent transparent transparent currentColor;
+}
+
+[data-theme="dark"] .promo-chapters a {
+  background: rgba(73, 177, 245, .18);
+}
+
+@media (max-width: 768px) {
+  .promo-chapters {
+    justify-content: flex-start;
+  }
+
+  .promo-chapters a {
+    font-size: .8rem;
+    padding: .28rem .68rem;
+  }
+}
